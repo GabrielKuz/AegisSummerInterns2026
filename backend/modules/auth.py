@@ -1,15 +1,22 @@
 from typing import Annotated
 import os
 from dotenv import load_dotenv
-
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from jwt import PyJWKClient, decode
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 load_dotenv()
-
+"""Use
+const response = await fetch("http://localhost:8000/auth/me", {
+  headers: {
+    Authorization: `Bearer ${entraIdToken}`,
+  },
+});
+const user = await response.json();
+console.log(user);
+"""
 TENANT_ID = os.getenv("TENANT_ID")
 CLIENT_ID = os.getenv("CLIENT_ID")
 JWKS_URL = f"https://login.microsoftonline.com/{TENANT_ID}/discovery/v2.0/keys"
@@ -23,17 +30,15 @@ jwks_client = PyJWKClient(JWKS_URL)
 scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 class Token(BaseModel):
-    access_token: str
-    token_type: str
+    access_token: str = Field(..., description="The access token issued by Entra ID")
+    token_type: str = Field(..., description="The type of the token, typically 'Bearer'")
 
 class TokenData(BaseModel):
-    username: str | None = None
+    username: str | None  = Field(None, description="The username extracted from the token")
 
 class User(BaseModel):
-    username: str
-    disabled: bool | None = None
-
-
+    username: str = Field(..., description="The username of the user")
+    disabled: bool | None = Field(None, description="Indicates if the user is disabled")
 
 async def getCurrentUser(token: Annotated[str, Depends(scheme)]):
     credentialsException = HTTPException(
@@ -69,3 +74,5 @@ async def getCurrentActiveUser(current_user: Annotated[User, Depends(getCurrentU
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
     return current_user
 
+async def userAuthenticated(current_user: Annotated[User, Depends(getCurrentUser)]) -> bool:
+    return current_user is not None

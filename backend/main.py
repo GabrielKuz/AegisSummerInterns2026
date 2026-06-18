@@ -29,7 +29,7 @@ async def get_current_user(current_user: Annotated[User, Depends(getCurrentActiv
 
 
 @app.get("/health")
-def health_check():
+def health_check(current_user: Annotated[User, Depends(getCurrentActiveUser)]):
     return {"status": "healthy"}
 
 def main():
