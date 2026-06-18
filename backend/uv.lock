@@ -23,7 +23,7 @@ wheels = [
 [[package]]
 name = "anyio"
 version = "4.14.0"
-source = { registry = "https://pypi.org/simple" }
+source = { registry = "https://pypi.org/simple" }   
 dependencies = [
     { name = "idna" },
 ]
