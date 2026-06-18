@@ -12,21 +12,21 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 @router.post("/files/")
 async def create_file(
-    file: Annotated[bytes | None, File(description="A file read as bytes")] = None,
+    file: Annotated[bytes | None, File(description="A file read as bytes")] = None, # Define the file parameter, which would be automatically read as bytes by FastAPI. If no file is provided, it defaults to None. And a description is added to the File for possibly some connection to the front end.
 ):
-    if file is None:
+    if file is None: # If no file is provided, return a message indicating that no file is present.
         return {"message": "No file present"}
-    return {"file_size": len(file)}
+    return {"file_size": len(file)} # If a file is provided, return the size of the file in bytes by calculating the length of the byte content.
 
 
 @router.post("/uploadfile/")
 async def create_upload_file(
-    file: Annotated[UploadFile | None, File(description="A file read as UploadFile")] = None,
+    file: Annotated[UploadFile | None, File(description="A file read as UploadFile")] = None, # Define the file parameter, which would be automatically read as an UploadFile by FastAPI. If no file is provided, it defaults to None. And a description is added to the File for possibly some connection to the front end.
 ):
-    if file is None:
+    if file is None: # If no file is provided, return a message indicating that no upload file is sent.
         return {"message": "No upload file sent"}
 
-    contents = await file.read()
+    contents = await file.read() # If file is present it will read it and upload to the path
     destination = UPLOAD_DIR / Path(file.filename).name
 
     with destination.open("wb") as f:
@@ -40,18 +40,18 @@ async def create_upload_file(
     }
 
 
-def get_file_size(file: UploadFile) -> int:
+def get_file_size(file: UploadFile) -> int: # Gets the file size
     file.file.seek(0, 2)
     size = file.file.tell()
     file.file.seek(0)
     return size
 
 
-def get_file_type(file: UploadFile):
+def get_file_type(file: UploadFile): # Gets the file type
     return file.content_type
 
 
-def get_file_name(file: UploadFile):
+def get_file_name(file: UploadFile): # Gets the file name
     return file.filename
 
 
