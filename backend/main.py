@@ -1,8 +1,12 @@
 from fastapi import FastAPI
+from modules.LinkGenerator import LinkRequest, generate_links
 
 
 app = FastAPI(title="Aegis Backend")
 
+@app.post("/backend/links/")
+def create_link(link_request: LinkRequest):
+    return generate_links(link_request)
 
 @app.get("/")
 def read_root():
