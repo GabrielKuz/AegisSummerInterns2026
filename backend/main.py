@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 
+from modules.uploader import router as uploader_router
 
 app = FastAPI(title="Aegis Backend")
+app.include_router(uploader_router)
 
 
 @app.get("/")
