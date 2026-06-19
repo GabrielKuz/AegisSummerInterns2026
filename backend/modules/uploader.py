@@ -29,19 +29,19 @@ async def create_upload_file(
 
     contents = await file.read() # If file is present it will read it and upload to the path
 
-    destination = UPLOAD_DIR / Path(file.filename).name
+    destination = UPLOAD_DIR / Path(file.filename).name # Creates destination path but does not 
     if destination.exists():
-        path_obj = Path(file.filename)
-        stem = path_obj.stem
-        suffix = path_obj.suffix
-        counter = 1
+        path_obj = Path(file.filename) # Makes a path from the name to grab the stem from later
+        stem = path_obj.stem # gets the file name without the extension
+        suffix = path_obj.suffix # gets the file name extension
+        counter = 1 # duplicate counter starts at 1
 
-        while destination.exists():
+        while destination.exists(): # If the destination already exists (E.g. a file with the same name already exists)
             if suffix:
-                destination = UPLOAD_DIR / f"{stem}_{counter}{suffix}"
+                destination = UPLOAD_DIR / f"{stem}_{counter}{suffix}" # if suffix is present then it will check for duplicates with same stem, counter, and suffix
             else:
-                destination = UPLOAD_DIR / f"{stem}_{counter}"
-            counter += 1
+                destination = UPLOAD_DIR / f"{stem}_{counter}" # if no suffix is present then it will check for duplicates with same stem and counter only
+            counter += 1 # increases counter further if another clone exists
 
     with destination.open("wb") as f:
         f.write(contents)
@@ -53,20 +53,4 @@ async def create_upload_file(
         "path": str(destination),
         "date and time": str(datetime.datetime.now()),
     }
-
-
-def get_file_size(file: UploadFile) -> int: # Gets the file size
-    file.file.seek(0, 2)
-    size = file.file.tell()
-    file.file.seek(0)
-    return size
-
-
-def get_file_type(file: UploadFile): # Gets the file type
-    return file.content_type
-
-
-def get_file_name(file: UploadFile): # Gets the file name
-    return file.filename
-
 
