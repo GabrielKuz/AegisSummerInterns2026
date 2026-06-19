@@ -28,7 +28,20 @@ async def create_upload_file(
         return {"message": "No upload file sent"}
 
     contents = await file.read() # If file is present it will read it and upload to the path
+
     destination = UPLOAD_DIR / Path(file.filename).name
+    if destination.exists():
+        path_obj = Path(file.filename)
+        stem = path_obj.stem
+        suffix = path_obj.suffix
+        counter = 1
+
+        while destination.exists():
+            if suffix:
+                destination = UPLOAD_DIR / f"{stem}_{counter}{suffix}"
+            else:
+                destination = UPLOAD_DIR / f"{stem}_{counter}"
+            counter += 1
 
     with destination.open("wb") as f:
         f.write(contents)
