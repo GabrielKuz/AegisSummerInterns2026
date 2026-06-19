@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Annotated
+import datetime
 
 from fastapi import APIRouter, File, UploadFile
 
@@ -37,6 +38,7 @@ async def create_upload_file(
         "content_type": file.content_type,
         "size": len(contents),
         "path": str(destination),
+        "date and time": str(datetime.datetime.now()),
     }
 
 
