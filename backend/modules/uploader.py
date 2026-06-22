@@ -26,12 +26,12 @@ async def create_upload_file(
     contents = await file.read() # If file is present it will read it and upload to the path
 
     destination = UPLOAD_DIR / Path(file.filename).name # Creates destination path but does not 
-    encrypted_destination = destination.with_suffix(destination.suffix + ".enc")
 
     # Generate the file-level key/IV used for the final encryption pass.
     file_key, file_iv = createEncryptKey()
 
     filehash = hashlib.sha256() # declares file hash >>>> to use sha256
+    filehash.update(contents)
 
     if destination.exists():
         path_obj = Path(file.filename) # Makes a path from the name to grab the stem from later
@@ -46,14 +46,14 @@ async def create_upload_file(
                 destination = UPLOAD_DIR / f"{stem}_{counter}" # if no suffix is present then it will check for duplicates with same stem and counter only
             counter += 1 # increases counter further if another clone exists
 
-    padder = padding.PKCS7(algorithms.AES256.block_size).padder()
-    padded_data = padder.update(contents) + padder.finalize()
+    padder = padding.PKCS7(algorithms.AES256.block_size).padder() #creates padder object
+    padded_data = padder.update(contents) + padder.finalize() # updates padder with contents of file to get ready for encryption
 
     cipher = Cipher(algorithms.AES256(file_key), modes.CBC(file_iv), backend=default_backend()).encryptor()
     ciphertext = cipher.update(padded_data) + cipher.finalize()
 
-    saved_file_hash = hashlib.sha256(file_bytes).hexdigest()
-    file_transfer_check = filehash.hexdigest() == saved_file_hash
+    saved_file_hash = hashlib.sha256(contents).hexdigest() # makes variable from sha256 hash of contents
+    file_transfer_check = filehash.hexdigest() == saved_file_hash # compares final file with file hash
     
     with destination.open("wb") as f:
         f.write(ciphertext)
@@ -63,6 +63,7 @@ async def create_upload_file(
         "content_type": file.content_type,
         "size": len(contents),
         "path": str(destination),
+        "file_transfer_check": file_transfer_check,
         "date and time": str(datetime.datetime.now()),
     }
 
