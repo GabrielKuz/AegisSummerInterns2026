@@ -7,36 +7,25 @@ from modules.LinkGenerator import LinkRequest, generate_links
 client = TestClient(app)
 
 
-def test_generate_links_returns_expected_link():
+def test_generate_links_returns_link_and_uuid():
     link_request = LinkRequest(
-        users_with_access=["alice"],
         case_id="case-123",
-        link="http://example.com",
-        creator="bob",
-        timestamp="2026-06-18T00:00:00Z",
-        uuid="uuid-123",
     )
 
     result = generate_links(link_request)
 
-    assert result["link"] == "http://example.com/links/uuid-123"
-    assert result["users_with_access"] == ["alice"]
-    assert result["case_id"] == "case-123"
-    assert result["creator"] == "bob"
-    assert result["timestamp"] == "2026-06-18T00:00:00Z"
+    assert result["link"].startswith("http://localhost:8000/backend/links/")
+    assert result["uuid"]
+    assert result["link"].endswith(result["uuid"])
 
 
 def test_create_link_endpoint_returns_generated_link():
     payload = {
-        "users_with_access": ["alice"],
         "case_id": "case-123",
-        "link": "http://example.com",
-        "creator": "bob",
-        "timestamp": "2026-06-18T00:00:00Z",
-        "uuid": "uuid-123",
     }
 
-    response = client.post("/backend/links/", json=payload)
+    response = client.post("/links/create/", json=payload)
 
-    assert response.status_code == 200
-    assert response.json()["link"] == "http://example.com/links/uuid-123"
+    assert response.status_code == 201
+    assert response.json()["link"].startswith("http://localhost:8000/backend/links/")
+    assert response.json()["uuid"]
