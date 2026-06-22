@@ -24,7 +24,6 @@ def get_current_user(user: Annotated[User, Depends(getCurrentActiveUser)]):
     return {"username": user.username, "disabled": user.disabled}
 
 
-
 def main():
     import uvicorn
 
@@ -33,46 +32,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    import os
-    from azure.storage.blob import BlobServiceClient
-
-    connection_string = os.environ["AZURE_STORAGE_CONNECTION_STRING"]
-
-    print("Connecting to storage...")
-
-    blob_service = BlobServiceClient.from_connection_string(
-        connection_string
-    )
-
-    # Create test container
-    container_name = "test-container"
-
-    try:
-        blob_service.create_container(container_name)
-        print(f"Created container: {container_name}")
-    except Exception as e:
-        print(f"Container may already exist: {e}")
-
-    # Upload test blob
-    blob_client = blob_service.get_blob_client(
-        container=container_name,
-        blob="hello.txt"
-    )
-
-    content = b"Hello from Azurite!"
-
-    blob_client.upload_blob(content, overwrite=True)
-    print("Uploaded blob")
-
-    # Download blob
-    downloaded = blob_client.download_blob().readall()
-
-    print("Downloaded blob contents:")
-    print(downloaded.decode())
-
-    # List containers
-    print("\nContainers:")
-    for container in blob_service.list_containers():
-        print(f" - {container['name']}")
-
-    print("\nSUCCESS")
+    
