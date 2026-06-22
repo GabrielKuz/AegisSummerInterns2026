@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Annotated
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
 import datetime
 import hashlib
 
@@ -25,6 +26,13 @@ async def create_upload_file(
     contents = await file.read() # If file is present it will read it and upload to the path
 
     destination = UPLOAD_DIR / Path(file.filename).name # Creates destination path but does not 
+    encrypted_destination = destination.with_suffix(destination.suffix + ".enc")
+
+    # Generate the file-level key/IV used for the final encryption pass.
+    file_key, file_iv = createEncryptKey()
+
+    filehash = hashlib.sha256() # declares file hash >>>> to use sha256
+
     if destination.exists():
         path_obj = Path(file.filename) # Makes a path from the name to grab the stem from later
         stem = path_obj.stem # gets the file name without the extension
@@ -41,11 +49,14 @@ async def create_upload_file(
     padder = padding.PKCS7(algorithms.AES256.block_size).padder()
     padded_data = padder.update(contents) + padder.finalize()
 
-    cipher = Cipher(algorithms.AES256())
+    cipher = Cipher(algorithms.AES256(file_key), modes.CBC(file_iv), backend=default_backend()).encryptor()
+    ciphertext = cipher.update(padded_data) + cipher.finalize()
 
+    saved_file_hash = hashlib.sha256(file_bytes).hexdigest()
+    file_transfer_check = filehash.hexdigest() == saved_file_hash
     
     with destination.open("wb") as f:
-        f.write(contents)
+        f.write(ciphertext)
 
     return {
         "filename": file.filename,
