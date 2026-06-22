@@ -7,7 +7,7 @@ from typing import Annotated
 app = FastAPI(title="Aegis Backend")
 app.include_router(uploader_router)
 
-@app.post("/backend/links/")
+@app.post("/links/create/")
 def create_link(link_request: LinkRequest):
     return generate_links(link_request)
 

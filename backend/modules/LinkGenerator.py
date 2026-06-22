@@ -1,20 +1,23 @@
-from fastapi import FastAPI
+from fastapi import HTTPException, status
 from pydantic import BaseModel, Field
 import uuid
+from datetime import datetime
+from modules.auth import getCurrentUser, userAuthenticated
 
 class LinkRequest(BaseModel):
-    users_with_access: list[str] = Field(..., description="List of users who should have access to the link")
     case_id: str = Field(..., description="ID of the case associated with the link")
-    link: str = Field(..., description="The generated link")
-    creator: str = Field(..., description="The user who created the link")
-    timestamp: str = Field(..., description="The timestamp when the link was created")
-    uuid: str = Field(str(uuid.uuid4()), description="A unique identifier for the link")
 
 link_data: dict[str, LinkRequest] = {}
 
+url: str = "http://localhost:8000/backend/links/" # base url for link generation, can be changed to actual domain when deployed
+
 def generate_links(link_request: LinkRequest):
-    return {"users_with_access": link_request.users_with_access, 
-            "case_id": link_request.case_id, 
-            "link": link_request.link + "/links/" + link_request.uuid, 
-            "creator": link_request.creator, 
-            "timestamp": link_request.timestamp}
+    if not userAuthenticated(getCurrentUser()):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not authenticated")
+    
+    if url is None:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Link generation failure")
+    
+    uuid_str = str(uuid.uuid4())
+    return {"link": url + uuid_str, 
+            "uuid": uuid_str}
