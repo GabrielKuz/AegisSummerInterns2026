@@ -3,9 +3,11 @@ from typing import Annotated
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import datetime
-import Ekeys
+import hashlib
 
 from fastapi import APIRouter, File, UploadFile
+
+from .Ekeys import createEncryptKey
 
 router = APIRouter()
 
@@ -38,6 +40,8 @@ async def create_upload_file(
 
     padder = padding.PKCS7(algorithms.AES256.block_size).padder()
     padded_data = padder.update(contents) + padder.finalize()
+
+    cipher = Cipher(algorithms.AES256())
 
     
     with destination.open("wb") as f:
