@@ -243,3 +243,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Azurite storage data
+.azurite/
+azurite/
+__blobstorage__/
+__queuestorage__/
+__tablestorage__/
