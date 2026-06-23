@@ -1,33 +1,55 @@
 import "./LoginPage.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import { signInDevUser } from "./devAuth";
+
+type LoginLocationState = {
+  from?: string;
+};
 
 const securityItems = [
   {
     number: "01",
     title: "Single Sign-On",
-    description: "Access is handled through your approved company identity provider.",
+    description:
+      "Access is handled through your approved company identity provider.",
   },
   {
     number: "02",
     title: "Controlled Data",
-    description: "Designed for secure ITAR and CUI transfer workflows.",
+    description:
+      "Designed for secure ITAR and CUI transfer workflows.",
   },
   {
     number: "03",
     title: "Gov Cloud Ready",
-    description: "Built for Azure Government Cloud deployment and auditing.",
+    description:
+      "Built for Azure Government Cloud deployment and auditing.",
   },
 ];
 
 export function LoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const handleSsoLogin = () => {
-    // Placeholder until backend gives real auth route.
-    window.location.href = "/api/auth/login";
+    // Temporary development-only login.
+    // Replace this with the real backend SSO redirect later.
+    signInDevUser();
+
+    const state = location.state as LoginLocationState | null;
+    const destination = state?.from ?? "/support";
+
+    navigate(destination, { replace: true });
   };
 
   return (
     <main className="login-page">
-      <section className="brand-side" aria-label="Aegis secure portal branding">
+      <section
+        className="brand-side"
+        aria-label="Aegis secure portal branding"
+      >
         <div className="brand-grid" />
+
         <div className="brand-shapes" aria-hidden="true">
           <span className="shape shape-one" />
           <span className="shape shape-two" />
@@ -41,26 +63,29 @@ export function LoginPage() {
             src="/images/aegis-logo.svg"
             alt="Aegis Software"
           />
-       
         </header>
 
         <section className="brand-message">
-
           <h1>
             Secure access for{" "}
             <span>controlled customer data.</span>
           </h1>
 
           <p className="brand-description">
-            A protected portal for transferring ITAR and CUI-related files with
-            clear access control, expiration, and audit visibility.
+            A protected portal for transferring ITAR and CUI-related
+            files with clear access control, expiration, and audit
+            visibility.
           </p>
         </section>
 
-        <section className="security-list" aria-label="Security highlights">
+        <section
+          className="security-list"
+          aria-label="Security highlights"
+        >
           {securityItems.map((item) => (
             <article className="security-item" key={item.number}>
               <span>{item.number}</span>
+
               <div>
                 <h2>{item.title}</h2>
                 <p>{item.description}</p>
@@ -71,8 +96,11 @@ export function LoginPage() {
       </section>
 
       <section className="auth-side" aria-label="Login">
-        <a className="support-link" href="mailto:support@aegissoftware.com">
-          Help & Support
+        <a
+          className="support-link"
+          href="mailto:support@aegissoftware.com"
+        >
+          Help &amp; Support
         </a>
 
         <section className="auth-card">
@@ -83,26 +111,40 @@ export function LoginPage() {
           <h2>Welcome back</h2>
 
           <p className="auth-copy">
-            Continue with your company Single Sign-On account to access the
-            secure data portal.
+            Continue with your company Single Sign-On account to
+            access the secure data portal.
           </p>
 
-          <button className="sso-button" type="button" onClick={handleSsoLogin}>
-            <span className="sso-button-label">Continue with SSO</span>
-            <span className="sso-button-arrow" aria-hidden="true">
+          <button
+            className="sso-button"
+            type="button"
+            onClick={handleSsoLogin}
+          >
+            <span className="sso-button-label">
+              Continue with SSO
+            </span>
+
+            <span
+              className="sso-button-arrow"
+              aria-hidden="true"
+            >
               ↗
             </span>
           </button>
 
           <div className="access-note">
             <span>Need access?</span>
+
             <a href="mailto:admin@aegissoftware.com">
               Contact your administrator
             </a>
           </div>
         </section>
 
-        <section className="identity-card" aria-label="Identity provider">
+        <section
+          className="identity-card"
+          aria-label="Identity provider"
+        >
           <div className="identity-grid" aria-hidden="true">
             <span />
             <span />
@@ -112,12 +154,15 @@ export function LoginPage() {
 
           <div>
             <h3>Microsoft Entra ID</h3>
-            <p>Enterprise identity authentication for approved users.</p>
+            <p>
+              Enterprise identity authentication for approved users.
+            </p>
           </div>
         </section>
 
         <footer className="auth-footer">
           <span>Protected by enterprise security controls</span>
+
           <nav aria-label="Legal links">
             <a href="/privacy">Privacy Policy</a>
             <span>/</span>
