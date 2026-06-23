@@ -42,7 +42,7 @@ class User(BaseModel):
 
 link_data: Dict[str, LinkRequest] = {}
 
-url: str = "http://localhost:8000/backend/links/" # base url for link generation, can be changed to actual domain when deployed
+url: str = f"http://{os.getenv('BACKEND_URL')}/backend/links/" 
 
 def generate_links(link_request: LinkRequest, auth: bool):
     if not auth:
