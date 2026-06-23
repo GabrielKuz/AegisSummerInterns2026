@@ -32,13 +32,14 @@ export function LoginPage() {
   const location = useLocation();
 
   const handleSsoLogin = () => {
-    // Temporary development-only login.
-    // Replace this with the real backend SSO redirect later.
-    signInDevUser();
-
     const state = location.state as LoginLocationState | null;
     const destination = state?.from ?? "/support";
 
+    const role = destination.startsWith("/upload")
+      ? "customer"
+      : "support";
+
+    signInDevUser(role);
     navigate(destination, { replace: true });
   };
 
@@ -146,6 +147,7 @@ export function LoginPage() {
           aria-label="Identity provider"
         >
           <div className="identity-grid" aria-hidden="true">
+            <span />
             <span />
             <span />
             <span />
