@@ -1,4 +1,4 @@
-# build reacy
+# build react
 FROM node:24-alpine3.22 AS builder
 
 WORKDIR /app

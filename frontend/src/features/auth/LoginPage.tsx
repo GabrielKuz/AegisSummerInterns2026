@@ -21,7 +21,7 @@ const securityItems = [
 export function LoginPage() {
   const handleSsoLogin = () => {
     // Placeholder until backend gives real auth route.
-    window.location.href = "/api/auth/login";
+    window.location.href = "/api/auth/me";
   };
 
   return (
