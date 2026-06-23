@@ -76,3 +76,4 @@ async def getCurrentActiveUser(current_user: Annotated[User, Depends(getCurrentU
 
 async def userAuthenticated(current_user: Annotated[User, Depends(getCurrentUser)]) -> bool:
     return current_user is not None
+
