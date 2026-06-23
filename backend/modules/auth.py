@@ -1,11 +1,13 @@
 from typing import Annotated
 import os
+import warnings
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from jwt import PyJWKClient, decode
 from pydantic import BaseModel, Field
+from warnings import deprecated
 
 load_dotenv()
 """Use
@@ -76,3 +78,10 @@ async def getCurrentActiveUser(current_user: Annotated[User, Depends(getCurrentU
 
 async def userAuthenticated(current_user: Annotated[User, Depends(getCurrentUser)]) -> bool:
     return current_user is not None
+
+@deprecated("use getCurrentActiveUser instead. This is insecure and only intended for testing")
+async def getCurrentUserNoAuthForTest():
+    warnings.warn("getCurrentUserNoAuthForTest is deprecated. Use getCurrentActiveUser instead.", UserWarning, stacklevel=2)
+    return User(username="testuser", disabled=False)
+
+getCurrentUserNoAuthForTest.__doc__ = "use getCurrentActiveUser instead. This is insecure and only intended for testing"
