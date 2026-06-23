@@ -15,7 +15,6 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from fastapi import APIRouter, File, UploadFile
 from modules import Session
-from .Ekeys import createEncryptKey
 
 router = APIRouter()
 session = Session()
