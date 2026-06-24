@@ -35,5 +35,6 @@ class LinkRecord(Base):
     case_id = Column(String)
     creator = Column(String)
     timestamp = Column(DateTime)
+    itar = Column(Boolean)
     users_with_access = Column(JSON)
     expired = Column(Boolean)
