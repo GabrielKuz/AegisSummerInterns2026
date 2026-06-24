@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
-from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, extend_link
+from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, extend_link_expiration
 from modules.auth import getCurrentActiveUser, getCurrentUser, User, userAuthenticated
 from modules.uploader import router as uploader_router, listFiles
 from modules.downloadData import downloadData
