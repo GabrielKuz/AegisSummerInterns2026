@@ -52,7 +52,7 @@ class LinkRecord(Base):
 session = Session()
 
 
-def downloadData(uuid: str, currentUser: User) -> RedirectResponse:
+def downloadData(upload_id: str, currentUser: User) -> RedirectResponse:
     unauthenticated = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -68,7 +68,7 @@ def downloadData(uuid: str, currentUser: User) -> RedirectResponse:
     if not currentUser or currentUser.disabled:
         raise unauthenticated
 
-    if not uuid:
+    if not upload_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Upload not found",
@@ -78,9 +78,9 @@ def downloadData(uuid: str, currentUser: User) -> RedirectResponse:
         text("""
             SELECT sas_retrieval_link, users_with_access
             FROM "LinkDB".uploads
-            WHERE uuid = :uuid
+            WHERE upload_id = :upload_id
         """),
-        {"uuid": uuid},
+        {"upload_id": upload_id},
     ).first()
 
     if upload is None:
@@ -91,9 +91,8 @@ def downloadData(uuid: str, currentUser: User) -> RedirectResponse:
 
     sasLink, accessList = upload
 
-    if accessList:
-        if currentUser.username not in accessList:
-            raise unauthorized
+    if not accessList or currentUser.username not in accessList:
+        raise unauthorized
 
     if not sasLink:
         raise HTTPException(
@@ -107,5 +106,5 @@ def downloadData(uuid: str, currentUser: User) -> RedirectResponse:
     )
 
 
-def logAccess(uuid: str, currentUser: User):
-    print(f"User {currentUser.username} accessed upload {uuid}")
+def logAccess(upload_id: str, currentUser: User):
+    print(f"User {currentUser.username} accessed upload {upload_id}")

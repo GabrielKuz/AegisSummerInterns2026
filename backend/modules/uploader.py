@@ -1,6 +1,7 @@
 import os
 import datetime
 import hashlib
+import uuid
 from pathlib import Path
 from typing import Annotated
 
@@ -12,8 +13,9 @@ from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_b
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from modules import Session
+from modules.auth import getCurrentActiveUser, User, getCurrentUserNoAuthForTest
 from modules.models import Base, UploadRecord, LinkRecord
 
 router = APIRouter()
@@ -55,6 +57,7 @@ except ResourceExistsError:
 
 @router.post("/uploadfile/{link_uuid}")
 async def create_upload_file(link_uuid: str,
+    current_user: Annotated[User, Depends(getCurrentUserNoAuthForTest)],
     file: Annotated[UploadFile | None, File(description="A file read as UploadFile")] = None,
 ):
     if file is None:
@@ -105,8 +108,9 @@ async def create_upload_file(link_uuid: str,
         # lookup LinkDB entry by provided UUID
         try:
             link_entry = session.query(LinkRecord).filter(LinkRecord.uuid == link_uuid).first()
-        except Exception:
-            link_entry = None
+        except Exception as e:
+            print("LINK LOOKUP ERROR:", e)
+            raise
 
         if link_entry:
             case_id = link_entry.case_id
@@ -131,53 +135,59 @@ async def create_upload_file(link_uuid: str,
         else:
             timestamp_val = now
 
-        # Build a SAS retrieval link for the uploaded blob using the Azurite env settings.
-        account_name = os.getenv("ACCOUNT_NAME")
-        account_key = os.getenv("ACCOUNT_KEY")
-        blob_endpoint = os.getenv("BLOB_ENDPOINT", "").rstrip("/")
+        try:
+            account_name = blob_service_client.account_name
 
-        if account_name and account_key and blob_endpoint:
-            try:
-                sas_token = generate_blob_sas(
-                    account_name=account_name,
-                    account_key=account_key,
-                    container_name=AZURE_CONTAINER_NAME,
-                    blob_name=blob_name,
-                    permission=BlobSasPermissions(read=True),
-                    expiry=datetime.datetime.utcnow() + datetime.timedelta(days=30),
-                )
-                sas_retrieval_link = f"{blob_endpoint}/{AZURE_CONTAINER_NAME}/{blob_name}?{sas_token}"
-            except Exception:
-                sas_retrieval_link = blob_client.url
-        else:
+            public_blob_endpoint = (
+                f"http://localhost:10000/{account_name}"
+            )
+
+            sas_token = generate_blob_sas(
+                account_name=account_name,
+                account_key=blob_service_client.credential.account_key,
+                container_name=AZURE_CONTAINER_NAME,
+                blob_name=blob_name,
+                permission=BlobSasPermissions(read=True),
+                expiry=datetime.datetime.utcnow() + datetime.timedelta(days=30),
+            )
+
+            sas_retrieval_link = (
+                f"{public_blob_endpoint}/"
+                f"{AZURE_CONTAINER_NAME}/"
+                f"{blob_name}?{sas_token}"
+            )
+
+        except Exception as e:
+            print("SAS GENERATION ERROR:", e)
             sas_retrieval_link = blob_client.url
 
 
-        # only insert a DB record if LinkDB entry exists and has a UUID
-        if not link_entry or not getattr(link_entry, 'uuid', None):
-            # skip DB insert when there's no LinkDB entry/UUID
-            inserted_uuid = None
-        else:
-            inserted_uuid = link_entry.uuid
+        inserted_upload_id = None
+        if link_entry and getattr(link_entry, 'uuid', None):
             record = UploadRecord(
-                uuid=inserted_uuid,
-            date_uploaded=now,
-            itar_status=itar_status,
-            combined_file_size=len(contents),
-            timestamp=timestamp_val,
-            max_days_in_storage=30,
-            case_id=case_id,
-            original_link=original_link,
-            sas_retrieval_link=sas_retrieval_link,
-            upload_complete=True,
-            users_with_access=users_with_access,
+                upload_id=str(uuid.uuid4()),
+                link_uuid=link_entry.uuid,
+                original_filename=file.filename,
+                blob_name=blob_name,
+                content_type=file.content_type,
+                sha256=saved_file_hash,
+                date_uploaded=now,
+                itar_status=itar_status,
+                combined_file_size=len(contents),
+                timestamp=timestamp_val,
+                max_days_in_storage=30,
+                case_id=case_id,
+                original_link=original_link,
+                sas_retrieval_link=sas_retrieval_link,
+                upload_complete=True,
+                users_with_access=users_with_access,
             )
             session.add(record)
             session.commit()
+            inserted_upload_id = record.upload_id
     except Exception:
-        # swallow DB errors so upload still succeeds
         try:
-            session.rollback()
+            print("UPLOAD ERROR:" + str(Exception))
         except Exception:
             pass
 
@@ -188,8 +198,40 @@ async def create_upload_file(link_uuid: str,
         "blob_name": blob_name,
         "blob_url": blob_client.url,
         "uuid": link_uuid,
+        "upload_id": inserted_upload_id,
         "file_transfer_check": file_transfer_check,
         "date_and_time": str(datetime.datetime.now()),
         "Sas_retrieval_link": sas_retrieval_link,
     }
+
+
+def get_uploads_for_link(link_uuid: str):
+    return session.query(UploadRecord).filter(UploadRecord.link_uuid == link_uuid).all()
+
+
+@router.get("/links/{linkUUID}/files")
+def listFiles(linkUUID: str, current_user: Annotated[User, Depends(getCurrentUserNoAuthForTest)]):
+    uploads = get_uploads_for_link(linkUUID)
+    authorized_uploads = [
+        upload for upload in uploads
+        if current_user.username in (upload.users_with_access or [])
+    ]
+
+    if uploads and not authorized_uploads:
+        raise HTTPException(
+            status_code=403,
+            detail="You do not have permission to access files for this link",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return [
+        {
+            "upload_id": upload.upload_id,
+            "filename": upload.original_filename,
+            "size": upload.combined_file_size,
+            "blob_name": upload.blob_name,
+            "content_type": upload.content_type,
+            "date_uploaded": upload.date_uploaded.isoformat() if upload.date_uploaded else None,
+        }
+        for upload in authorized_uploads]
 

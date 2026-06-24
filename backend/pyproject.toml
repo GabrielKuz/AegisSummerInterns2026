@@ -10,6 +10,7 @@ dependencies = [
     "azure-mgmt-storage>=25.0.0",
     "azure-storage-blob>=12.30.0",
     "fastapi>=0.115.0",
+    "httpx2>=2.4.0",
     "psycopg[binary]>=3.3.4",
     "pyjwt[crypto]>=2.13.0",
     "pytest>=9.1.1",
