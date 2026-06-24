@@ -5,6 +5,11 @@ Project of Aegis Software interns during the summer of 2026
 # Tech stack
 ## Backend
 - Python 3.14.5
+- nginx
+- Docker
+- uv
+- Azure/Azurite
+- PostgreSQL
 
 Run backend with `docker compose up --build`
 Run backend tests with `uv run pytest -v` (cd into /backend first)
