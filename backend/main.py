@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 from modules.LinkGenerator import LinkRequest, generate_links
-from modules.auth import getCurrentActiveUser, getCurrentUser, User, userAuthenticated, getCurrentUserNoAuthForTest
+from modules.auth import getCurrentActiveUser, getCurrentUser, User, userAuthenticated
 from modules.uploader import router as uploader_router, listFiles
 from modules.downloadData import downloadData
 from typing import Annotated
@@ -18,6 +18,9 @@ def create_link(link_request: LinkRequest, current_user: Annotated[User, Depends
 def read_root():
     return {"status": "ok"}
 
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
 
 def main():
     import uvicorn
@@ -27,7 +30,7 @@ def main():
 @app.get("/links/{uuid}/download")
 @deprecated("use /uploads/{upload_id}/download instead. This assumes only one uploaded file per link")
 def download_link(uuid: str, currentUser: Annotated[User, Depends(getCurrentActiveUser)]):
-    uploads = listFiles(uuid)
+    uploads = listFiles(uuid, currentUser)
     if len(uploads) == 1:
         return downloadData(uploads[0]["upload_id"], currentUser)
     if not uploads:

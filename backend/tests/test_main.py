@@ -44,6 +44,8 @@ def test_NoAuthNotPresent():
     violations = []
 
     for pyfile in PROJECT_ROOT.rglob("*.py"):
+        if pyfile.name == "auth.py" or pyfile.name == "test_main.py": # allow the definition of the function in auth.py and test_main.py
+            continue
         if any(part in {"venv", ".venv", "__pycache__"} for part in pyfile.parts): # skip venv
             continue
 
@@ -66,4 +68,4 @@ def test_NoAuthNotPresent():
                 if node.id == forbiddenMethod:
                     violations.append(f"{pyfile}:{node.lineno} referenced {forbiddenMethod}")
 
-    assert violations==1, ("Insecure call to getCurrentUserNoAuthForTest() found:\n"+ "\n".join(sorted(set(violations)))) #Only allow the definition of the function in auth.py
+    assert not violations, ("Insecure call to getCurrentUserNoAuthForTest() found:\n"+ "\n".join(sorted(set(violations)))) #Only allow the definition of the function in auth.py

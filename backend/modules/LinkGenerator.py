@@ -44,7 +44,6 @@ def generate_links(link_request: LinkRequest, current_user: User):
 
 def store_link(link_request: LinkRequest,uuid_str: str, current_user: User):
     print("STORE_LINK CALLED", uuid_str)
-    print("LINKGEN DB:", engine.url)
 
     with Session() as session:
         record = LinkRecord(
