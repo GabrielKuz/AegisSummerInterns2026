@@ -249,3 +249,9 @@ dist-ssr
 #azurite
 azurite_db_*.json
 azurite_data/*
+# Azurite storage data
+.azurite/
+azurite/
+__blobstorage__/
+__queuestorage__/
+__tablestorage__/
