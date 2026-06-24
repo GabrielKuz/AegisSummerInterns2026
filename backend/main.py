@@ -20,7 +20,7 @@ def get_links(current_user: Annotated[User, Depends(getCurrentActiveUser)]):
 
 @app.patch("/links/{uuid}/extend")
 def extend_link_endpoint(uuid: str, extension: int, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
-    return extend_link(uuid, extension, current_user)
+    return extend_link_expiration(uuid, current_user, extension)
 
 @app.get("/")
 def read_root():
