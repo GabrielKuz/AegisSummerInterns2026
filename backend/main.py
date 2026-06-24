@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
-from modules.LinkGenerator import LinkRequest, generate_links
+from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, extend_link
 from modules.auth import getCurrentActiveUser, getCurrentUser, User, userAuthenticated
 from modules.uploader import router as uploader_router, listFiles
 from modules.downloadData import downloadData
@@ -13,6 +13,14 @@ app.include_router(uploader_router)
 def create_link(link_request: LinkRequest, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
     #authentication: bool = userAuthenticated(getCurrentUser())
     return generate_links(link_request, current_user) #TODO: CHANGE IMMENDIATLY AFTER TESTING
+
+@app.get("/api/links")
+def get_links(current_user: Annotated[User, Depends(getCurrentActiveUser)]):
+    return get_all_links(current_user)
+
+@app.patch("/links/{uuid}/extend")
+def extend_link_endpoint(uuid: str, extension: int, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
+    return extend_link(uuid, extension, current_user)
 
 @app.get("/")
 def read_root():
