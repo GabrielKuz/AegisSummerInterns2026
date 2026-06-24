@@ -15,7 +15,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from modules import Session
-from modules.auth import getCurrentActiveUser, User, getCurrentUser, getCurrentUserNoAuthForTest
+from modules.auth import getCurrentActiveUser, User, getCurrentUser
 from modules.models import Base, UploadRecord, LinkRecord
 
 router = APIRouter()
@@ -57,7 +57,7 @@ except ResourceExistsError:
 
 @router.post("/uploadfile/{link_uuid}")
 async def create_upload_file(link_uuid: str,
-    current_user: Annotated[User, Depends(getCurrentUserNoAuthForTest)],
+    current_user: Annotated[User, Depends(getCurrentActiveUser)],
     file: Annotated[UploadFile | None, File(description="A file read as UploadFile")] = None,
 ):
     if file is None:
@@ -210,7 +210,7 @@ def get_uploads_for_link(link_uuid: str):
 
 
 @router.get("/links/{linkUUID}/files")
-def listFiles(linkUUID: str, current_user: Annotated[User, Depends(getCurrentUserNoAuthForTest)]):
+def listFiles(linkUUID: str, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
     uploads = get_uploads_for_link(linkUUID)
     authorized_uploads = [
         upload for upload in uploads
