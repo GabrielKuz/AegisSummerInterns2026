@@ -2,12 +2,14 @@ from fastapi import FastAPI, Depends, HTTPException
 from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, extend_link_expiration
 from modules.auth import getCurrentActiveUser, getCurrentUser, User, userAuthenticated
 from modules.uploader import router as uploader_router, listFiles
+from modules.deletionRequest import router as deletionRequest_router
 from modules.downloadData import downloadData
 from typing import Annotated
 from warnings import deprecated
 
 app = FastAPI(title="Aegis Backend", root_path="/api")
 app.include_router(uploader_router)
+app.include_router(deletionRequest_router)
 
 @app.post("/links/create/")
 def create_link(link_request: LinkRequest, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
@@ -52,3 +54,4 @@ def download_upload(upload_id: str, currentUser: Annotated[User, Depends(getCurr
 
 if __name__ == "__main__":
     main()
+
