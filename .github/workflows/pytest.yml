@@ -51,6 +51,12 @@ jobs:
             -U test_user \
             -d test_db \
             -c '\dt "LinkDB".*'
+            
+      - name: Debug containers
+        run: |
+          docker compose ps
+          docker compose exec -T backend env | grep DATABASE_URL
+          docker compose exec -T postgres pg_isready -U test_user -d test_db
 
       - name: Run pytest
         run: docker compose exec -T backend uv run pytest -v
