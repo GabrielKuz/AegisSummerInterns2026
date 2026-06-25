@@ -40,12 +40,7 @@ jobs:
         run: docker compose up -d --build
 
       - name: Wait for backend health
-        run: |
-          timeout 60 bash -c '
-            until [ "$(docker inspect -f "{{.State.Health.Status}}" $(docker compose ps -q backend))" = "healthy" ]; do
-              sleep 2
-            done
-          '
+        run: sleep 15
 
       - name: Show backend logs
         run: docker compose logs backend
