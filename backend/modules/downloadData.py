@@ -89,7 +89,8 @@ def downloadData(upload_id: str, currentUser: User) -> RedirectResponse:
             detail="Upload not found",
         )
 
-    sasLink, accessList = upload
+    sasLink:str = upload.sas_retrieval_link
+    accessList:list[str] = upload.users_with_access # JSONB type
 
     if not accessList or currentUser.username not in accessList:
         raise unauthorized

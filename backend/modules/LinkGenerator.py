@@ -7,6 +7,7 @@ from typing import Dict
 from modules.auth import User
 from modules.models import LinkRecord
 import os
+from sqlalchemy.dialects.postgresql import JSONB
 from modules import Session, engine
 
 DATABASE_URL = os.getenv("DATABASE_URL")

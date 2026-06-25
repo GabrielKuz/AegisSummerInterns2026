@@ -5,9 +5,12 @@ from sqlalchemy import text
 def main():
     with engine.begin() as conn:
         conn.execute(text('CREATE SCHEMA IF NOT EXISTS "LinkDB"'))
-
-    print("Creating tables...")
-    Base.metadata.create_all(bind=engine)
+        if not engine.dialect.has_table(conn, "uploads", schema="LinkDB"):
+            print("Creating 'uploads' table...")
+            Base.metadata.create_all(bind=engine, tables=[Base.metadata.tables["LinkDB.uploads"]])
+        if not engine.dialect.has_table(conn, "links", schema="LinkDB"):
+            print("Creating 'links' table...")
+            Base.metadata.create_all(bind=engine, tables=[Base.metadata.tables["LinkDB.links"]])
 
     with engine.connect() as conn:
         result = conn.execute(text("""
