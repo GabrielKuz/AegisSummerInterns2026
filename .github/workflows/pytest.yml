@@ -39,6 +39,24 @@ jobs:
       - name: Start Docker Compose stack
         run: docker compose up -d --build
 
+      - name: Wait for backend health
+        run: |
+          timeout 60 bash -c '
+            until [ "$(docker inspect -f "{{.State.Health.Status}}" $(docker compose ps -q backend))" = "healthy" ]; do
+              sleep 2
+            done
+          '
+
+      - name: Show backend logs
+        run: docker compose logs backend
+
+      - name: List tables
+        run: |
+          docker compose exec -T postgres psql \
+            -U test_user \
+            -d test_db \
+            -c '\dt "LinkDB".*'
+
       - name: Run pytest
         run: docker compose exec -T backend uv run pytest -v
 
