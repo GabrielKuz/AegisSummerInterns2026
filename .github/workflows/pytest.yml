@@ -30,6 +30,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Host diagnostics
+        run: |
+          cat /proc/pressure/memory || true
+          cat /proc/pressure/cpu || true
+          systemctl status --no-pager || true
+
       - name: Start Docker Compose stack
         run: docker compose up -d --build
 
