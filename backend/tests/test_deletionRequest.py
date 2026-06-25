@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
-os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
+os.environ.setdefault("DATABASE_URL", "postgresql+psycopg:///:memory:")
 os.environ.setdefault("CLIENT_ID", "test-client-id")
 os.environ.setdefault("TENANT_ID", "test-tenant")
 
