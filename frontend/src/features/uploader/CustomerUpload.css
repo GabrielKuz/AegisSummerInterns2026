@@ -1,0 +1,373 @@
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap');
+html, body {
+    height: 100%;
+    margin: 0;
+}
+.customer-upload{
+    max-width:1080px;
+    margin: 0 auto;
+    padding: 40px;
+    font-family: "Hanken Grotesk", sans-serif;
+    background: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/*HEADER*/
+/*.page-header{
+    width: 100%;
+    background-color: black;
+    color: white;
+    border: 10px solid #ff0000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+}*/
+
+.page-header {
+    /*max-width: 100%;*/
+    width: 100%;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    /*gap: 24px;*/
+    padding: 16px 28px;
+    background-color: black;
+    border-top: 10px solid #ff0000;
+    color: white;
+    margin-bottom: 0;
+}
+
+.page-header h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+}
+
+.page-header span {
+    display: block;
+    margin-top: 4px;
+    color: #ffffff;
+    font-size: 13px;
+    line-height: 1.6;
+}
+/*AEGIS LOGO*/
+.logo img {
+  width: 200px;
+  height: auto;
+  display: block;
+}
+
+/*HEADER TEXT*/
+.header-text {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-left: auto;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+}
+.header-right {
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+/*BODY*/
+.central-container{
+    display: flex;
+    align-items: stretch;
+    flex: 1;
+}
+
+/*SIDEBAR*/
+
+/*.sidebar{
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background-color: #083446;
+    
+    padding: 20px;
+    flex-shrink: 0;
+    align-self: stretch;
+}
+
+.sidebar-item{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+
+    transition:
+        transform 160ms ease,
+        border-color 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.sidebar-item:hover {
+    transform: translateY(-3px);
+    border-color: #ef3b32;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.25);
+}
+.sidebar-item.active {
+    border-color: #ef3b32;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.sidebar-item h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: white;
+}
+
+.sidebar-item span {
+    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    
+}
+
+*/
+
+.support-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-rows: 76px minmax(0, 1fr);
+  background: var(--color-gray-light, #f2f2f2);
+}
+ 
+.support-header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 0 30px;
+  color: #ffffff;
+  background: #000000;
+  border-top: 4px solid #ef3b32;
+}
+ 
+.support-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+ 
+.support-logo {
+  width: 260px;
+  height: auto;
+}
+/* 
+.divide {
+    width: 1px;
+    height: 60px;
+    background-color: rgba(255, 255, 255, 0.24);
+    flex-shrink: 0;
+}
+*/ 
+.support-brand > div {
+  display: grid;
+  gap: 3px;
+  
+}
+ 
+.support-product-name {
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+}
+ 
+.support-section-name {
+  color: rgba(255, 255, 255, 0.62);
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-top: 2px;
+}
+ 
+.support-user-menu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+ 
+.support-user-menu > div {
+  display: grid;
+  gap: 3px;
+  text-align: right;
+}
+ 
+.support-user-menu strong {
+  font-size: 13px;
+}
+ 
+.support-user-menu span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+}
+ 
+.support-user-menu button {
+  min-height: 38px;
+  padding: 0 16px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+}
+ 
+.support-user-menu button:hover {
+  border-color: #ef3b32;
+}
+ 
+.support-sidebar {
+  grid-column: 1;
+  grid-row: 2;
+  padding: 28px 16px;
+  background: #1a1a1a;
+}
+ 
+.support-sidebar nav {
+  display: grid;
+  gap: 8px;
+}
+ 
+.support-nav-link {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  color: rgba(255, 255, 255, 0.72);
+  border-left: 3px solid transparent;
+  text-decoration: none;
+}
+ 
+.support-nav-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+ 
+.support-nav-link-active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: #ef3b32;
+}
+ 
+.support-main {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  padding: 48px;
+  overflow: auto;
+}
+
+.support-title{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 0;
+}
+@media (max-width: 760px) {
+  .support-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+ 
+  .support-header {
+    grid-column: 1;
+    padding: 18px 20px;
+  }
+ 
+  .support-sidebar {
+    grid-column: 1;
+    grid-row: 2;
+  }
+ 
+  .support-sidebar nav {
+    grid-template-columns: repeat(3, 1fr);
+  }
+ 
+  .support-main {
+    grid-column: 1;
+    grid-row: 3;
+    padding: 28px 20px;
+  }
+}
+
+/*MAIN*/
+.main-content {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+/*NOTE TEXT*/
+/*.note {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+*/
+/*UPLOAD BOX */
+.upload-box {
+    background: white;
+    border: 2px dashed #999;
+    border-radius: 10px;
+    padding: 50px;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.browse-button{
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #1d5a83;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.upload-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.note {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+    margin: 0;
+}
+
