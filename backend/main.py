@@ -69,6 +69,13 @@ def download_link(uuid: str, currentUser: Annotated[User, Depends(getCurrentActi
         raise HTTPException(status_code=404, detail="No uploads found for this link")
     return uploads
 
+@app.get("/links/{uuid}")
+def getLinkInfo(uuid: str, currentUser: Annotated[User, Depends(getCurrentActiveUser)]):
+    data = get_all_links(currentUser)
+    for link in data:
+        if link["uuid"] == uuid:
+            return link
+    raise HTTPException(status_code=404, detail="Link not found")
 
 @app.get("/uploads/{upload_id}/download")
 def download_upload(upload_id: str, currentUser: Annotated[User, Depends(getCurrentActiveUser)]):

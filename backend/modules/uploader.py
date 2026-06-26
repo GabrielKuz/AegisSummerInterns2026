@@ -230,6 +230,8 @@ async def create_upload_file(link_uuid: str,
         "content_type": file.content_type,
         "size": len(contents),
         "uuid": link_uuid,
+        "server_hash": server_hash,
+        "blob_hash": persisted_hash,
         "date_and_time": str(datetime.datetime.now()),
     }
 

@@ -78,9 +78,11 @@ def _deleteExpiredLinks():
 
 def expireAndDeleteOldData():
     try:
+        logger.info("starting data cleanup")
         _expireUploads()
         _expireLinks()
         _deleteExpiredUploads()
         _deleteExpiredLinks()
+        logger.info("data successfully deleted")
     except Exception as e:
         logger.error(f"Error in expireAndDeleteOldData: {e}")
