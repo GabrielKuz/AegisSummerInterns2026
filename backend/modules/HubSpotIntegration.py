@@ -1,45 +1,64 @@
+import os
+from typing import Optional
+
 from hubspot import HubSpot
-from hubspot.crm.contacts import SimplePublicObjectInputForCreate
-from hubspot.oauth import ApiException
-from pathlib import Path
-from typing import Iterable
+from hubspot.crm.tickets import ApiException, PublicObjectSearchRequest
+from hubspot.crm.tickets.models import Filter, FilterGroup
 
-api_client = HubSpot(access_token='your_access_token')
+api_client = HubSpot(access_token=os.getenv("HUBSPOT_ACCESS_TOKEN"))
 
-# or set your access token later
-# api_client = HubSpot()
-# api_client.access_token = 'your_access_token'
 
-def get_accessToken():
+def get_ticket(ais_id: str):
+    if not ais_id:
+        return None
+
+    search_request = PublicObjectSearchRequest(
+        filter_groups=[
+            FilterGroup(
+                filters=[
+                    Filter(
+                        property_name="ais_id",
+                        operator="EQ",
+                        value=ais_id,
+                    )
+                ]
+            )
+        ],
+        properties=["ais_id", "subject", "caseID", "caseStatus", "expiration_date"],
+    )
+
     try:
-        tokens = api_client.oauth.tokens_api.create(
-            grant_type = "authorization_code",
-            redirect_uri = 'http://localhost',
-            client_id = 'client_id',
-            client_secret = 'client_secret',
-            code = 'code'
-        )
-    except ApiException as e:
-        print("Exception when calling create_token method: %s\n" % e)
+        response = api_client.crm.tickets.search_api.do_search(search_request)
+    except ApiException:
+        return None
 
-def get_caseID() -> String:
-
-def get_caseStatus(caseID: str) -> String:
+    results = getattr(response, "results", None) or []
+    return results[0] if results else None
 
 
-def is_caseExpirable(caseID: str) -> bool:
+def get_ticket_id(ais_id: str) -> Optional[str]:
+    ticket = get_ticket(ais_id)
+    return getattr(ticket, "id", None)
 
 
+def get_caseID(ais_id: str) -> Optional[str]:
+    ticket = get_ticket(ais_id)
+    if not ticket:
+        return None
+    return (ticket.properties or {}).get("caseID")
 
 
-#def send_emailForSupport() -> void:
-#    try:
-#        simple_public_object_input_for_create = SimplePublicObjectInputForCreate(
-#            properties = {"email":""}
-#            #              ^ Email for support ^
-#        )
-#       api_response = api_client.crm.contacts.basic_api.create(
-#            simple_public_object_input_for_create=simple_public_object_input_for_create
-#        )
-#    except ApiException as e:
-#        print("Exception when creating contact: %s\n" % e)
+def get_caseStatus(ais_id: str) -> Optional[str]:
+    ticket = get_ticket(ais_id)
+    if not ticket:
+        return None
+    return (ticket.properties or {}).get("caseStatus")
+
+
+def is_caseExpirable(ais_id: str) -> bool:
+    ticket = get_ticket(ais_id)
+    if not ticket:
+        return False
+
+    expiration_date = (ticket.properties or {}).get("expiration_date")
+    return bool(expiration_date)
