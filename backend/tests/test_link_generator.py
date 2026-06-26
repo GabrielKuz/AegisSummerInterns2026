@@ -5,10 +5,12 @@ from main import app
 from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, extend_link_expiration, expire_old_links
 from datetime import datetime, timedelta
 from modules.auth import User, getCurrentActiveUser
+import os
 
 
 client = TestClient(app)
 current_user = User(username="testuser", disabled=False)  # Mock user for testing
+url = f"{os.getenv('BACKEND_URL')}/backend/links/"  # Assuming this is the base URL for links
 
 async def override_get_current_active_user() -> User:
     return User(username="testuser", disabled=False)
@@ -23,7 +25,7 @@ def test_generate_links_returns_link_and_uuid():
 
     result = generate_links(link_request, current_user)
 
-    assert result["link"].startswith("http://localhost:8000/backend/links/")
+    assert result["link"].startswith(url)
     assert result["uuid"]
     assert result["link"].endswith(result["uuid"])
 
@@ -36,7 +38,7 @@ def test_create_link_endpoint_returns_generated_link():
     
     response = client.post("/links/create/", json=payload)
 
-    assert response.json()["link"].startswith("http://localhost:8000/backend/links/")
+    assert response.json()["link"].startswith(url)
     assert response.json()["uuid"]
 
 

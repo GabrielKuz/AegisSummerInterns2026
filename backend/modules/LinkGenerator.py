@@ -20,7 +20,7 @@ class LinkRequest(BaseModel):
 
 link_data: Dict[str, LinkRequest] = {}
 
-url = f"http://{os.getenv('BACKEND_URL')}/backend/links/"
+url = f"{os.getenv('BACKEND_URL')}/backend/links/"
 
 
 def generate_links(link_request: LinkRequest, current_user: User):
