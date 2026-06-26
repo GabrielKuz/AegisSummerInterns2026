@@ -1,6 +1,8 @@
 import "./UploadDetails.css";
 import {NavLink} from "react-router-dom";
 import { useState } from "react";
+import "../../styles/SupportTheme.css";
+import { ThemeToggle } from "../../theme/ThemeToggle";
 
 export function UploadDetails() {
     const[mode, setMode] = useState<"USA" | "EU">("USA");
@@ -13,7 +15,7 @@ export function UploadDetails() {
                         alt="Aegis Software"
                         className="support-logo"
                     />
-
+                    <div className="support-header-divider" />
                     <div className="support-title">
                         <span className="support-product-name">
                             Link Details
@@ -23,6 +25,9 @@ export function UploadDetails() {
                             View link information
                         </span>
                     </div>
+                </div>
+                <div className="support-header-actions">
+                    <ThemeToggle />
                 </div>
             </header>
 

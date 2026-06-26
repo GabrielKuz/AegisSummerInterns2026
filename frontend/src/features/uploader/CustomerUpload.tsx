@@ -1,4 +1,6 @@
 import "./CustomerUpload.css";
+import "../../styles/SupportTheme.css";
+import { ThemeToggle } from "../../theme/ThemeToggle";
 import {NavLink, Outlet} from "react-router-dom";
 
 export function CustomerUpload() {
@@ -13,7 +15,7 @@ export function CustomerUpload() {
                         alt="Aegis Software"
                         className="support-logo"
                     />
-
+                    <div className="support-header-divider" />
                     <div className="support-title">
                         <span className="support-product-name">
                             Customer Upload
@@ -23,6 +25,9 @@ export function CustomerUpload() {
                             Provide files for support
                         </span>
                     </div>
+                </div>
+                <div className="support-header-actions">
+                    <ThemeToggle />
                 </div>
             </header>
 

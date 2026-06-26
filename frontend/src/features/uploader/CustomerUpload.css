@@ -8,7 +8,7 @@ html, body {
     margin: 0 auto;
     padding: 40px;
     font-family: "Hanken Grotesk", sans-serif;
-    background: #ffffff;
+    background: var(--theme-page);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -147,10 +147,10 @@ html, body {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
   grid-template-rows: 76px minmax(0, 1fr);
-  background: var(--color-gray-light, #f2f2f2);
+  background: var(--theme-page);
 }
  
-.support-header {
+/*.support-header {
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
@@ -161,11 +161,21 @@ html, body {
   background: #000000;
   border-top: 4px solid #ef3b32;
 }
- 
+*/
+.support-header {
+  display: flex;
+  align-items: center;
+  height: 76px; 
+  padding: 0 30px;
+  box-sizing: border-box;
+  background: #000000;
+  color: #ffffff;
+  border-top: 4px solid #ef3b32;
+} 
 .support-brand {
   display: flex;
   align-items: center;
-  gap: 16px;
+  /*gap: 16px;*/
 }
  
 .support-logo {
@@ -193,7 +203,7 @@ html, body {
 }
  
 .support-section-name {
-  color: rgba(255, 255, 255, 0.62);
+  color: var(--theme-page);
   font-family: var(--font-mono, monospace);
   font-size: 11px;
   text-transform: uppercase;
@@ -240,7 +250,7 @@ html, body {
   grid-column: 1;
   grid-row: 2;
   padding: 28px 16px;
-  background: #1a1a1a;
+  background: var(--theme-surface-secondary);
 }
  
 .support-sidebar nav {
@@ -253,19 +263,19 @@ html, body {
   display: flex;
   align-items: center;
   padding: 0 16px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--theme-text-secondary);
   border-left: 3px solid transparent;
   text-decoration: none;
 }
  
 .support-nav-link:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--theme-text);
+  background: var(--support-row-hover);
 }
  
 .support-nav-link-active {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--theme-text);
+  background: var(--support-row-hover);
   border-left-color: #ef3b32;
 }
  
@@ -275,6 +285,8 @@ html, body {
   min-width: 0;
   padding: 48px;
   overflow: auto;
+  background: transparent;
+  color: var(--theme-text);
 }
 
 .support-title{
@@ -331,13 +343,14 @@ html, body {
 */
 /*UPLOAD BOX */
 .upload-box {
-    background: white;
-    border: 2px dashed #999;
+    background: var(--theme-surface);
+    border: 2px dashed var(--theme-border);
     border-radius: 10px;
     padding: 50px;
     text-align: center;
     width: 100%;
     max-width: 500px;
+    color: var(--theme-text);
 }
 
 .browse-button{
@@ -369,5 +382,20 @@ a {
     max-width: 800px;
     text-align: center;
     margin: 0;
+    color: var(--theme-text-secondary);
 }
 
+.support-header-divider {
+  width: 4px;      
+  background: var(--theme-border-strong);
+  margin: 0 28px;
+  align-self: stretch;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+.support-header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
