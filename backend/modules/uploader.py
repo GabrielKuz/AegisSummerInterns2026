@@ -13,13 +13,31 @@ from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_b
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile
 from modules import Session
 from modules.auth import getCurrentActiveUser, User, getCurrentUser
 from modules.models import Base, UploadRecord, LinkRecord
 
 router = APIRouter()
 session = Session()
+
+
+def hash_bytes(data: bytes) -> str:
+    """Return the SHA-256 hash for the provided bytes."""
+    return hashlib.sha256(data).hexdigest()
+
+
+def validate_file_hash(contents: bytes, file_hash_clientside: str | None) -> str:
+    """Validate that the client-side hash matches the payload and return the computed hash."""
+    if not file_hash_clientside:
+        raise ValueError("X-File-Hash header is required")
+
+    normalized_client_hash = file_hash_clientside.strip().lower()
+    computed_hash = hash_bytes(contents)
+    if normalized_client_hash != computed_hash:
+        raise ValueError("File hash mismatch")
+
+    return computed_hash
 
 
 def ensure_uploads_table(db_session):
@@ -59,13 +77,18 @@ except ResourceExistsError:
 async def create_upload_file(link_uuid: str,
     current_user: Annotated[User, Depends(getCurrentActiveUser)],
     file: Annotated[UploadFile | None, File(description="A file read as UploadFile")] = None,
+    file_hash_clientside: Annotated[str | None, Header(alias="X-File-Hash")] = None,
 ):
     if file is None:
         return {"message": "No upload file sent"}
 
     contents = await file.read()
-    filehash = hashlib.sha256()
-    filehash.update(contents)
+
+    try:
+        server_hash = validate_file_hash(contents, file_hash_clientside)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     filename = Path(file.filename).name
     blob_name = filename
     blob_client = container_client.get_blob_client(blob_name)
@@ -81,13 +104,13 @@ async def create_upload_file(link_uuid: str,
             else:
                 blob_name = f"{stem}_{counter}"
             blob_client = container_client.get_blob_client(blob_name)
+
             counter += 1
 
 
     
 
-    saved_file_hash = hashlib.sha256(contents).hexdigest()
-    file_transfer_check = filehash.hexdigest() == saved_file_hash
+    
     # ensure uploads table exists before persisting
     try:
         ensure_uploads_table(session)
@@ -95,6 +118,11 @@ async def create_upload_file(link_uuid: str,
         # if table creation fails, continue with upload but don't block the file upload
         pass
     blob_client.upload_blob(contents, overwrite=False)
+
+    persisted_contents = blob_client.download_blob().readall()
+    persisted_hash = hash_bytes(persisted_contents)
+    if persisted_hash != server_hash:
+        raise HTTPException(status_code=500, detail="Uploaded file hash does not match the persisted blob contents")
 
     # create a DB record for this upload, pulling info from LinkDB if available
     try:
@@ -113,6 +141,12 @@ async def create_upload_file(link_uuid: str,
             raise
 
         if link_entry:
+            if link_entry.expired:
+                raise HTTPException(
+                    status_code=410,
+                    detail="This link has expired and is no longer available for uploads",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
             case_id = link_entry.case_id
             # keep users_with_access as stored in LinkDB if present
             users_with_access = link_entry.users_with_access or []
@@ -148,7 +182,7 @@ async def create_upload_file(link_uuid: str,
                 container_name=AZURE_CONTAINER_NAME,
                 blob_name=blob_name,
                 permission=BlobSasPermissions(read=True),
-                expiry=datetime.datetime.utcnow() + datetime.timedelta(days=30),
+                expiry=datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=30),
             )
 
             sas_retrieval_link = (
@@ -170,7 +204,7 @@ async def create_upload_file(link_uuid: str,
                 original_filename=file.filename,
                 blob_name=blob_name,
                 content_type=file.content_type,
-                sha256=saved_file_hash,
+                sha256=server_hash,
                 date_uploaded=now,
                 itar_status=itar_status,
                 combined_file_size=len(contents),
@@ -195,13 +229,9 @@ async def create_upload_file(link_uuid: str,
         "filename": file.filename,
         "content_type": file.content_type,
         "size": len(contents),
-        "blob_name": blob_name,
-        "blob_url": blob_client.url,
         "uuid": link_uuid,
-        "upload_id": inserted_upload_id,
         "file_transfer_check": file_transfer_check,
         "date_and_time": str(datetime.datetime.now()),
-        "Sas_retrieval_link": sas_retrieval_link,
     }
 
 

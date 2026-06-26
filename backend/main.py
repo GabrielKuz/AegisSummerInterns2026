@@ -1,26 +1,50 @@
 from fastapi import FastAPI, Depends, HTTPException
-from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, extend_link_expiration
+from modules.LinkGenerator import LinkRequest, generate_links, get_all_links
+from modules.auth import getCurrentActiveUser, getCurrentUser, User
+from modules.LinkGenerator import LinkRequest, generate_links, get_all_links
 from modules.auth import getCurrentActiveUser, getCurrentUser, User, userAuthenticated
 from modules.uploader import router as uploader_router, listFiles
 from modules.downloadData import downloadData
+from modules import Session, engine
 from typing import Annotated
 from warnings import deprecated
+from contextlib import asynccontextmanager
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from zoneinfo import ZoneInfo
+from modules.DataCleaner import expireAndDeleteOldData
+from sqlalchemy import text
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="Aegis Backend", root_path="/api")
+scheduler = AsyncIOScheduler(timezone=ZoneInfo("America/New_York"))
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler.add_job(
+        expireAndDeleteOldData,
+        trigger="cron",
+        hour=0,
+        minute=0,
+        id="daily_cleanup",
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+    )
+    scheduler.start()
+    yield
+    scheduler.shutdown(wait=False)
+
+app = FastAPI(title="Aegis Backend", root_path="/api", lifespan=lifespan)
 app.include_router(uploader_router)
 
 @app.post("/links/create/")
-def create_link(link_request: LinkRequest, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
+def create_link(link_request: LinkRequest, current_user: Annotated[User, Depends(getCurrentActiveUser)]):  # TODO: Change to getCurrentActiveUser after testing
     #authentication: bool = userAuthenticated(getCurrentUser())
     return generate_links(link_request, current_user) #TODO: CHANGE IMMENDIATLY AFTER TESTING
 
-@app.get("/api/links")
-def get_links(current_user: Annotated[User, Depends(getCurrentActiveUser)]):
+@app.get("/links/")
+def get_links(current_user: Annotated[User, Depends(getCurrentActiveUser)]):  # TODO: Change to getCurrentActiveUser after testing
     return get_all_links(current_user)
 
-@app.patch("/links/{uuid}/extend")
-def extend_link_endpoint(uuid: str, extension: int, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
-    return extend_link_expiration(uuid, current_user, extension)
 
 @app.get("/")
 def read_root():
