@@ -24,7 +24,7 @@ def get_ticket(ais_id: str):
                 ]
             )
         ],
-        properties=["ais_ticket_number", "subject", "caseID", "caseStatus", "expiration_date"],
+        properties=["ais_ticket_number", "createdate", "sql_server", "company_name"],
     )
 
     try:
@@ -43,9 +43,7 @@ def get_ticket_id(ais_id: str) -> Optional[str]:
 
 def get_caseID(ais_id: str) -> Optional[str]:
     ticket = get_ticket(ais_id)
-    if not ticket:
-        return None
-    return (ticket.properties or {}).get("caseID")
+    return getattr(ticket, "id", None)
 
 
 def get_caseStatus(ais_id: str) -> Optional[str]:
