@@ -24,9 +24,11 @@ def get_accessToken():
 
 def get_caseID() -> String:
 
-def get_caseStatus(caseID: str) -> type:
+def get_caseStatus(caseID: str) -> String:
+
 
 def is_caseExpirable(caseID: str) -> bool:
+
 
 
 
@@ -41,5 +43,3 @@ def is_caseExpirable(caseID: str) -> bool:
 #        )
 #    except ApiException as e:
 #        print("Exception when creating contact: %s\n" % e)
-
-
