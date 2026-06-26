@@ -1,20 +1,20 @@
-export type TicketStatus =
+export type LinkStatus =
   | "Open"
   | "In progress"
   | "Resolved";
 
-export type SupportTicket = {
+export type SupportLink = {
   id: string;
   subject: string;
   category: string;
-  status: TicketStatus;
+  status: LinkStatus;
   createdAt: string;
   updatedAt: string;
 };
 
-export const mockTickets: SupportTicket[] = [
+export const mockLinks: SupportLink[] = [
   {
-    id: "TKT-1042",
+    id: "LNK-1042",
     subject: "Unable to access secure upload request",
     category: "Access",
     status: "Open",
@@ -22,7 +22,7 @@ export const mockTickets: SupportTicket[] = [
     updatedAt: "2026-06-21",
   },
   {
-    id: "TKT-1038",
+    id: "LNK-1038",
     subject: "File upload stopped before completion",
     category: "File upload",
     status: "In progress",
@@ -30,7 +30,7 @@ export const mockTickets: SupportTicket[] = [
     updatedAt: "2026-06-20",
   },
   {
-    id: "TKT-1029",
+    id: "LNK-1029",
     subject: "Question about request expiration",
     category: "Expiration",
     status: "Resolved",

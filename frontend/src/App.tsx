@@ -7,8 +7,8 @@ import {
 import { LoginPage } from "./features/auth/LoginPage";
 import { RequireDevUser } from "./features/auth/RequireDevUser";
 import { SupportHomePage } from "./features/support/pages/SupportHomePage";
-import { SupportTicketsPage } from "./features/support/pages/SupportTicketsPage";
-import { CreateSupportTicketPage } from "./features/support/pages/CreateSupportTicketPage";
+import { SupportLinksPage } from "./features/support/pages/SupportLinksPage";
+import { CreateSupportLinkPage } from "./features/support/pages/CreateSupportLinkPage";
 import { SupportLayout } from "./layouts/SupportLayout";
 import { CustomerUpload } from "./features/uploader/CustomerUpload";
 import { UploadDetails } from "./features/uploader/UploadDetails";
@@ -57,12 +57,12 @@ export default function App() {
         >
           <Route index element={<SupportHomePage />} />
           <Route
-            path="tickets"
-            element={<SupportTicketsPage />}
+            path="links"
+            element={<SupportLinksPage />}
           />
           <Route
-            path="tickets/new"
-            element={<CreateSupportTicketPage />}
+            path="links/new"
+            element={<CreateSupportLinkPage />}
           />
           
         </Route>

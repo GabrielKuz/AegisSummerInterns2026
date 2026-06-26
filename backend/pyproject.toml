@@ -1,23 +1,23 @@
 [project]
 name = "backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "Backend for Aegis interns 2026 project"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "dotenv>=0.9.9",
+    "azure-keyvault-secrets>=4.11.0",
+    "azure-mgmt-resource>=25.0.0",
+    "azure-mgmt-storage>=25.0.0",
     "azure-storage-blob>=12.30.0",
     "fastapi>=0.115.0",
-    "pyjwt[crypto]>=2.13.0",
-    "python-multipart>=0.0.32",
-    "uvicorn>=0.30.0",
-    "python-dotenv>=1.2.2",
-    "sqlalchemy>=2.0.51",
+    "httpx2>=2.4.0",
+    "hubspot-api-client>=12.0.0",
     "psycopg[binary]>=3.3.4",
-]
-
-[dependency-groups]
-dev = [
-    "httpx>=0.27.0",
-    "pytest>=8.0.0",
+    "pyjwt[crypto]>=2.13.0",
+    "pytest>=9.1.1",
+    "python-dotenv>=1.2.2",
+    "python-multipart>=0.0.32",
+    "requests>=2.34.2",
+    "sqlalchemy>=2.0.51",
+    "uvicorn>=0.30.0",
 ]

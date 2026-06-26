@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { getDevUser, signOutDevUser } from "../features/auth/devAuth";
+import { ThemeToggle } from "../theme/ThemeToggle";
 import "./SupportLayout.css";
 
 export function SupportLayout() {
@@ -21,6 +22,10 @@ export function SupportLayout() {
             className="support-logo"
           />
 
+          <div className="divide">
+            |
+          </div>
+
           <div>
             <span className="support-product-name">
               Secure Data Portal
@@ -36,6 +41,8 @@ export function SupportLayout() {
             <strong>{user?.name ?? "Support User"}</strong>
             <span>{user?.email}</span>
           </div>
+
+          <ThemeToggle />
 
           <button type="button" onClick={handleSignOut}>
             Sign out
@@ -58,25 +65,25 @@ export function SupportLayout() {
           </NavLink>
 
           <NavLink
-            to="/support/tickets"
+            to="/support/links"
             className={({ isActive }) =>
               isActive
                 ? "support-nav-link support-nav-link-active"
                 : "support-nav-link"
             }
           >
-            Created tickets
+            Created links
           </NavLink>
 
           <NavLink
-            to="/support/tickets/new"
+            to="/support/links/new"
             className={({ isActive }) =>
               isActive
                 ? "support-nav-link support-nav-link-active"
                 : "support-nav-link"
             }
           >
-            Create ticket
+            Create link
           </NavLink>
         </nav>
       </aside>
