@@ -30,9 +30,10 @@ services:
     image: mcr.microsoft.com/azure-storage/azurite
     container_name: azurite
     ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
+      - "10000:10000" # move to expose when done dev
+    expose:
+      - "10001"
+      - "10002"
     volumes:
       - ./azurite_data:/data
     command: >
@@ -60,8 +61,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    ports:
-      - "5432:5432"
+    #ports:
+      #- "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
