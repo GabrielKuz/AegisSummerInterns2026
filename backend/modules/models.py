@@ -26,6 +26,7 @@ class UploadRecord(Base):
     upload_complete = Column(Boolean, default=False)
     for_deletion = Column(Boolean, default=False, nullable=False)
     users_with_access = Column(JSON, nullable=True)
+    for_deletion = Column(Boolean, default=False, nullable=False) 
 
 
 class LinkRecord(Base):

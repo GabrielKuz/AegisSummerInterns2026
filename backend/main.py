@@ -4,6 +4,7 @@ from modules.auth import getCurrentActiveUser, getCurrentUser, User
 from modules.LinkGenerator import LinkRequest, generate_links, get_all_links
 from modules.auth import getCurrentActiveUser, getCurrentUser, User, userAuthenticated
 from modules.uploader import router as uploader_router, listFiles
+from modules.deletionRequest import router as deletionRequest_router
 from modules.downloadData import downloadData
 from modules import Session, engine
 from typing import Annotated
@@ -35,6 +36,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Aegis Backend", root_path="/api", lifespan=lifespan)
 app.include_router(uploader_router)
+app.include_router(deletionRequest_router)
 
 @app.post("/links/create/")
 def create_link(link_request: LinkRequest, current_user: Annotated[User, Depends(getCurrentActiveUser)]):  # TODO: Change to getCurrentActiveUser after testing
@@ -83,3 +85,4 @@ def download_upload(upload_id: str, currentUser: Annotated[User, Depends(getCurr
 
 if __name__ == "__main__":
     main()
+
