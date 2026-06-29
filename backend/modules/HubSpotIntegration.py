@@ -77,3 +77,7 @@ def get_caseSQLServer(ais_id: str) -> Optional[str]:
 #def get_AIS_ID(ticket_id: str) -> Optional[str]:
 #    ticket = get_ticket(ais_id)
 #    return getattr(ticket, "id", None)
+
+#used for testing rn
+if __name__ == "__main__":
+    print(get_ticket_id("AIS-6614"))
