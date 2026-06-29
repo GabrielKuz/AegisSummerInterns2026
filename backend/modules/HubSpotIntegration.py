@@ -35,28 +35,45 @@ def get_ticket(ais_id: str):
     results = getattr(response, "results", None) or []
     return results[0] if results else None
 
+# creates ticket object from ais id and then allows an input of search item to be found attached to the ticket object
+def quikSrch(ais_id: str, searchTerm: str) -> Optional[str]:
+    ticket = get_ticket(ais_id)
+    if not ticket:
+        return None
+    return (ticket.properties or {}).get(searchTerm)
+
+
 
 def get_ticket_id(ais_id: str) -> Optional[str]:
     ticket = get_ticket(ais_id)
     return getattr(ticket, "id", None)
 
 
-def get_caseID(ais_id: str) -> Optional[str]:
-    ticket = get_ticket(ais_id)
-    return getattr(ticket, "id", None)
+def get_caseCreateDate(ais_id: str) -> Optional[str]:
+    return quikSrch(ais_id,"createdate")
+
+def get_caseCompany(ais_id: str) -> Optional[str]:
+    return quikSrch(ais_id,"company_name")
+
+def get_caseSQLServer(ais_id: str) -> Optional[str]:
+    return quikSrch(ais_id,"sql_server")
 
 
-def get_caseStatus(ais_id: str) -> Optional[str]:
-    ticket = get_ticket(ais_id)
-    if not ticket:
-        return None
-    return (ticket.properties or {}).get("caseStatus")
+#def get_caseStatus(ais_id: str) -> Optional[str]:
+#    ticket = get_ticket(ais_id)
+#    if not ticket:
+#        return None
+#    return (ticket.properties or {}).get("caseStatus")
 
 
-def is_caseExpirable(ais_id: str) -> bool:
-    ticket = get_ticket(ais_id)
-    if not ticket:
-        return False
+#def is_caseExpirable(ais_id: str) -> bool:
+#    ticket = get_ticket(ais_id)
+#    if not ticket:
+#        return False
+#
+#    expiration_date = (ticket.properties or {}).get("expiration_date")
+#    return bool(expiration_date)
 
-    expiration_date = (ticket.properties or {}).get("expiration_date")
-    return bool(expiration_date)
+#def get_AIS_ID(ticket_id: str) -> Optional[str]:
+#    ticket = get_ticket(ais_id)
+#    return getattr(ticket, "id", None)
