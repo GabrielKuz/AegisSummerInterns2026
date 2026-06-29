@@ -20,7 +20,7 @@ html, body {
     flex: 1;
 }
 
-/*SIDEBAR*/
+/*HEADER*/
 
 .support-layout {
   min-height: 100vh;
@@ -40,24 +40,33 @@ html, body {
   color: #ffffff;
   border-top: 4px solid #ef3b32;
 } 
+
+.support-header-divider {
+  width: 4px;      
+  background: var(--theme-border-strong);
+  margin: 0 28px;
+  align-self: stretch;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+.support-header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .support-brand {
   display: flex;
   align-items: center;
   
 }
- 
+/*AEGIS LOGO*/
 .support-logo {
   width: 260px;
   height: auto;
 }
-/* 
-.divide {
-    width: 1px;
-    height: 60px;
-    background-color: rgba(255, 255, 255, 0.24);
-    flex-shrink: 0;
-}
-*/ 
+
 .support-brand > div {
   display: grid;
   gap: 3px;
@@ -100,7 +109,7 @@ html, body {
   color: rgba(255, 255, 255, 0.62);
   font-size: 11px;
 }
- 
+/*MENU BUTTON*/
 .support-user-menu button {
   min-height: 38px;
   padding: 0 16px;
@@ -113,7 +122,7 @@ html, body {
 .support-user-menu button:hover {
   border-color: #ef3b32;
 }
- 
+/*SIDEBAR*/
 .support-sidebar {
   grid-column: 1;
   grid-row: 2;
@@ -125,7 +134,7 @@ html, body {
   display: grid;
   gap: 8px;
 }
- 
+/*SIDEBAR LINKS*/ 
 .support-nav-link {
   min-height: 46px;
   display: flex;
@@ -198,17 +207,7 @@ html, body {
     align-items: center;
     justify-content: center;
 }
-/*NOTE TEXT*/
-/*.note {
-    background: white;
-    padding: 15px;
-    border-radius: 6px;
-    margin-bottom: 30px;
-    width: 100%;
-    max-width: 800px;
-    text-align: center;
-}
-*/
+
 /*UPLOAD BOX */
 .upload-box {
     background: var(--theme-surface);
@@ -220,7 +219,7 @@ html, body {
     max-width: 500px;
     color: var(--theme-text);
 }
-
+/*UPLOAD BUTTON*/
 .browse-button{
     margin-top: 15px;
     padding: 10px 20px;
@@ -244,7 +243,7 @@ a {
     justify-content: center;
     gap: 24px;
 }
-
+/*UPLOAD TEXT*/
 .note {
     width: 100%;
     max-width: 800px;
@@ -253,17 +252,3 @@ a {
     color: var(--theme-text-secondary);
 }
 
-.support-header-divider {
-  width: 4px;      
-  background: var(--theme-border-strong);
-  margin: 0 28px;
-  align-self: stretch;
-  flex-shrink: 0;
-  border-radius: 2px;
-}
-.support-header-actions {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
