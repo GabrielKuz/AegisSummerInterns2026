@@ -33,10 +33,22 @@ def generate_links(link_request: LinkRequest, current_user: User):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not authenticated"
         )
+    
+    if not link_request.case_id.startswith("AIS-") and not link_request.case_id[link_request.case_id.index("-")+1:].isdigit():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid Case-ID: Bad Request"
+        )
 
     uuid_str = str(uuid.uuid4())
 
     store_link(link_request, uuid_str, current_user)
+
+    if not url or not uuid_str:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Link or UUID not found"
+        )
 
     return {
         "link": url + uuid_str,
