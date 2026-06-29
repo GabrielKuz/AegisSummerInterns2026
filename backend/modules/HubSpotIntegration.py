@@ -7,33 +7,21 @@ from hubspot.crm.tickets.models import Filter, FilterGroup
 
 api_client = HubSpot(access_token=os.getenv("HUBSPOT_ACCESS_TOKEN"))
 
+#=======================================================================================================
+# Main Functions
+#=======================================================================================================
 
 def get_ticket(ais_id: str):
-    if not ais_id:
-        return None
+    return advancedSearchThroughHubSpot(ais_id, "ais_ticket_number")
 
-    search_request = PublicObjectSearchRequest(
-        filter_groups=[
-            FilterGroup(
-                filters=[
-                    Filter(
-                        property_name="ais_ticket_number",
-                        operator="EQ",
-                        value=ais_id,
-                    )
-                ]
-            )
-        ],
-        properties=["ais_ticket_number", "createdate", "sql_server", "company_name"],
-    )
 
-    try:
-        response = api_client.crm.tickets.search_api.do_search(search_request)
-    except ApiException:
-        return None
+def get_AIS_Id(ticket_id: str) -> Optional[str]:
+    ticket = advancedSearchThroughHubSpot(ticket_id, "hs_object_id")
+    return (ticket.properties or {}).get("ais_ticket_number") if ticket else None
 
-    results = getattr(response, "results", None) or []
-    return results[0] if results else None
+#=======================================================================================================
+# quik Systems
+#=======================================================================================================
 
 # creates ticket object from ais id and then allows an input of search item to be found attached to the ticket object
 def quikSrch(ais_id: str, searchTerm: str) -> Optional[str]:
@@ -42,12 +30,29 @@ def quikSrch(ais_id: str, searchTerm: str) -> Optional[str]:
         return None
     return (ticket.properties or {}).get(searchTerm)
 
+def quikAtrbt(ais_id: str, searchTerm: str) -> Optional[str]:
+    ticket = get_ticket(ais_id)
+    return getattr(ticket, searchTerm, None)
 
+#=======================================================================================================
+# Attribute functions 
+#=======================================================================================================
 
 def get_ticket_id(ais_id: str) -> Optional[str]:
-    ticket = get_ticket(ais_id)
-    return getattr(ticket, "id", None)
+    return quikAtrbt(ais_id, 'id')
 
+def is_ticket_archived(ais_id: str) -> Optional[str]:
+    return quikAtrbt(ais_id, 'archived')
+
+def ticket_archive_location(ais_id: str) -> Optional[str]:
+    return quikAtrbt(ais_id, 'archived_at')
+
+def ticket_updated_at(ais_id: str) -> Optional[str]:
+    return quikAtrbt(ais_id, 'updated at')
+
+#=======================================================================================================
+# Property functions 
+#=======================================================================================================
 
 def get_caseCreateDate(ais_id: str) -> Optional[str]:
     return quikSrch(ais_id,"createdate")
@@ -58,26 +63,34 @@ def get_caseCompany(ais_id: str) -> Optional[str]:
 def get_caseSQLServer(ais_id: str) -> Optional[str]:
     return quikSrch(ais_id,"sql_server")
 
+#=======================================================================================================
+# Miscellaneous functions 
+#=======================================================================================================
 
-#def get_caseStatus(ais_id: str) -> Optional[str]:
-#    ticket = get_ticket(ais_id)
-#    if not ticket:
-#        return None
-#    return (ticket.properties or {}).get("caseStatus")
+def advancedSearchThroughHubSpot(searchTerm: str, searchTermHS_name: str):
+    if not searchTerm:
+        return None
+    search_request = PublicObjectSearchRequest(
+        filter_groups=[
+            FilterGroup(
+                filters=[
+                    Filter(
+                        property_name=searchTermHS_name,
+                        operator="EQ",
+                        value=searchTerm,
+                    )
+                ]
+            )
+        ],
+        properties=["ais_ticket_number", "hs_object_id", "createdate", "sql_server", "company_name", "hs_lastmodifieddate"],
+    )
 
+    try:
+        response = api_client.crm.tickets.search_api.do_search(search_request)
+    except ApiException:
+        return None
 
-#def is_caseExpirable(ais_id: str) -> bool:
-#    ticket = get_ticket(ais_id)
-#    if not ticket:
-#        return False
-#
-#    expiration_date = (ticket.properties or {}).get("expiration_date")
-#    return bool(expiration_date)
+    results = getattr(response, "results", None) or []
+    return results[0] if results else None
 
-#def get_AIS_ID(ticket_id: str) -> Optional[str]:
-#    ticket = get_ticket(ais_id)
-#    return getattr(ticket, "id", None)
-
-#used for testing rn
-if __name__ == "__main__":
-    print(get_ticket_id("AIS-6614"))
+    
