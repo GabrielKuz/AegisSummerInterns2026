@@ -10,43 +10,34 @@ import { SupportHomePage } from "./features/support/pages/SupportHomePage";
 import { SupportLinksPage } from "./features/support/pages/SupportLinksPage";
 import { CreateSupportLinkPage } from "./features/support/pages/CreateSupportLinkPage";
 import { SupportLayout } from "./layouts/SupportLayout";
+import { CustomerLayout } from "./layouts/CustomerLayout";
 import { CustomerUpload } from "./features/uploader/CustomerUpload";
 import { UploadDetails } from "./features/uploader/UploadDetails";
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         <Route path="/" element={<LoginPage />} />
+
         <Route
           path="/upload"
           element={
             <RequireDevUser>
-              <CustomerUpload />
+              <CustomerLayout />
             </RequireDevUser>
           }
         >
+          <Route index element={<CustomerUpload />} />
           <Route
-            index
-            element={
-              <div className="upload-content">
-                <p className="note">
-                  <b>Note:</b> This link is temporary and will cease working after
-                  (insert time here). Please ensure that you upload your files by the
-                  given time remaining.
-                </p>
-
-                <div className="upload-box">
-                  <p>Choose file(s) or drag and drop here</p>
-                  <button className="browse-button">
-                    Browse Files
-                  </button>
-                </div>
-              </div>
-            }
-          />          
-          
+            path="/upload/details"
+            element={<UploadDetails />}
+          />
         </Route>
-        <Route path="/upload/details" element={<UploadDetails />} />
+
+
+
+
         <Route
           path="/support"
           element={
@@ -64,11 +55,10 @@ export default function App() {
             path="links/new"
             element={<CreateSupportLinkPage />}
           />
-          
+
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
 }
- 
