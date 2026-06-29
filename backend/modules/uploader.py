@@ -163,6 +163,12 @@ async def create_upload_file(
         sas_retrieval_link = None
 
         if link_entry:
+            if link_entry.expired:
+                raise HTTPException(
+                    status_code=410,
+                    detail="This link has expired and is no longer available for uploads",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
             case_id = link_entry.case_id
             users_with_access = link_entry.users_with_access or []
             original_link = link_entry.link or original_link
@@ -251,8 +257,6 @@ async def create_upload_file(
         "content_type": file.content_type,
         "size": len(contents),
         "uuid": link_uuid,
-        "upload_id": inserted_upload_id,
-        "file_transfer_check": True,
         "server_hash": server_hash,
         "blob_hash": persisted_hash,
         "date_and_time": str(datetime.datetime.now()),

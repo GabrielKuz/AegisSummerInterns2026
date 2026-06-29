@@ -24,6 +24,7 @@ class UploadRecord(Base):
     original_link = Column(Text, nullable=True)
     sas_retrieval_link = Column(Text, nullable=True)
     upload_complete = Column(Boolean, default=False)
+    for_deletion = Column(Boolean, default=False, nullable=False)
     users_with_access = Column(JSON, nullable=True)
     for_deletion = Column(Boolean, default=False, nullable=False) 
 
