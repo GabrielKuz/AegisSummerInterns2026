@@ -60,3 +60,6 @@ def is_caseExpirable(ais_id: str) -> bool:
 
     expiration_date = (ticket.properties or {}).get("expiration_date")
     return bool(expiration_date)
+
+if __name__ == "__main__":
+    print(get_ticket_id("AIS-6614"))
