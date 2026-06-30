@@ -107,5 +107,3 @@ def advancedSearchThroughHubSpot(searchTerm: str, searchTermHS_name: str):
 
     results = getattr(response, "results", None) or []
     return results[0] if results else None
-
-#       ||| USED FOR TESTING |||  if __name__ == "__main__":  ||| USED FOR TESTING |||  
