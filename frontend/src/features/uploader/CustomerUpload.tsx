@@ -42,6 +42,61 @@ export function CustomerUpload() {
         setSelectedFiles(prev => prev.filter((_, index) => index !== indexToRemove));
     };
 
+    const [uploading, setUploading] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState<Record<string, string>>({});
+
+    const uploadFiles = async () => {
+        setUploading(true);
+
+        const uuid = "THISISATEMPUID";
+
+        try {
+            for (const item of selectedFiles) {
+                setUploadStatus(prev => ({
+                    ...prev,
+                    [item.file.name]: "uploading"
+                }));
+
+                const formData = new FormData();
+                formData.append("file", item.file);
+
+                const fileBuffer = await item.file.arrayBuffer();
+                const hashBuffer = await crypto.subtle.digest("SHA-256", fileBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const sha256 = hashArray
+                    .map(b => b.toString(16).padStart(2, "0"))
+                    .join("");
+
+                const response = await fetch(`/api/uploadfile/${uuid}`, {
+                    method: "POST",
+                    headers: {
+                        Region: "US",
+                        SHA256: sha256
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    setUploadStatus(prev => ({
+                        ...prev,
+                        [item.file.name]: "error"
+                    }));
+                    continue;
+                }
+
+                const data = await response.json();
+                console.log("Uploaded:", data);
+
+                setUploadStatus(prev => ({
+                    ...prev,
+                    [item.file.name]: "done"
+                }));
+            }
+        } finally {
+            setUploading(false);
+        }
+    };
+
     return (
         <main className="support-main">
             <div className="upload-content">
@@ -69,8 +124,16 @@ export function CustomerUpload() {
 
                             {selectedFiles.map((item, index) => (
                                 <div key={index} className="selected-file">
-                                    <span>{item.file.name}</span>
+                                    <div style={{ display: "flex", flexDirection: "column" }}>
+                                        <span>{item.file.name}</span>
 
+                                        <small>
+                                            {uploadStatus[item.file.name] === "uploading" && "Uploading..."}
+                                            {uploadStatus[item.file.name] === "done" && "Uploaded"}
+                                            {uploadStatus[item.file.name] === "error" && "Failed"}
+                                            {!uploadStatus[item.file.name] && ""}
+                                        </small>
+                                    </div>
                                     <div style={{ display: "flex", gap: "10px" }}>
                                         <a
                                             href={item.preview}
@@ -88,21 +151,15 @@ export function CustomerUpload() {
                                         </button>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        multiple style={{ display: "none" }}
-                        onChange={handleFileChange}
-                    />
-
-                    {selectedFiles.length > 0 && (
-                        <button className="browse-button">
-                            Upload Files
-                        </button>
-                    )}
+                        ))}
+                    </div>
+                )}
+                    <input type="file" ref={fileInputRef} multiple style={{ display: "none" }} onChange={handleFileChange} />
+                {selectedFiles.length > 0 && (
+                    <button className="browse-button" onClick={uploadFiles}>
+                        Upload Files
+                    </button>
+                )}
                 </div>
 
             </div>
