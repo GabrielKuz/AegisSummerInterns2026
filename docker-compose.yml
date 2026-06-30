@@ -32,6 +32,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+    
+    cap_drop:
+      - ALL
+
+    security_opt:
+      - no-new-privileges:true
 
     depends_on:
       azurite-us:
@@ -134,9 +140,16 @@ services:
       context: .
       dockerfile: nginx/DOCKERFILE
     ports:
-      - "80:80"
+      - "80:8080" # avoid nginx running as root  
+      # Switch to 443:8443 eventually
     depends_on:
       - backend
+      
+    cap_drop:
+      - ALL
+
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 5s
