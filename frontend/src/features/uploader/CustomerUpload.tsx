@@ -1,6 +1,6 @@
 import "./CustomerUpload.css";
 import "../../styles/SupportTheme.css";
-import { useRef, type ChangeEvent, useState } from "react";
+import { useRef, useState } from "react";
 
 export function CustomerUpload() {
     const fileInputRef = useRef<HTMLInputElement>(null);
