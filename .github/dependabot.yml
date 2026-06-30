@@ -1,0 +1,70 @@
+version: 2
+
+updates:
+  - package-ecosystem: "uv"
+    open-pull-requests-limit: 3
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+      timezone: "America/New_York"
+    commit-message:
+      prefix: "deps"
+    cooldown:
+      default-days: 7
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker"
+    open-pull-requests-limit: 3
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:30"
+      timezone: "America/New_York"
+    commit-message:
+      prefix: "deps"
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+
+  - package-ecosystem: "docker"
+    open-pull-requests-limit: 3
+    directory: "/nginx"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "01:00"
+      timezone: "America/New_York"
+    commit-message:
+      prefix: "deps"
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+
+  - package-ecosystem: "docker-compose"
+    open-pull-requests-limit: 3
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "01:30"
+      timezone: "America/New_York"
+    commit-message:
+      prefix: "deps"
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
