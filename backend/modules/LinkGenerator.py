@@ -20,7 +20,7 @@ class LinkRequest(BaseModel):
 
 link_data: Dict[str, LinkRequest] = {}
 
-url = f"http://{os.getenv('BACKEND_URL')}/backend/links/"
+url = f"{os.getenv('BACKEND_URL')}/backend/links/"
 
 
 def generate_links(link_request: LinkRequest, current_user: User):
@@ -56,6 +56,7 @@ def generate_links(link_request: LinkRequest, current_user: User):
     }
 
 
+def store_link(link_request: LinkRequest, uuid_str: str, current_user: User):
 def store_link(link_request: LinkRequest,uuid_str: str, current_user: User):
     """
     Stores the generated link and UUID in the database with associated case ID, 
@@ -71,8 +72,9 @@ def store_link(link_request: LinkRequest,uuid_str: str, current_user: User):
             itar=link_request.itar,
             creator=current_user.username,
             timestamp=datetime.now(),
+            expiration_date=datetime.now() + timedelta(days=2),
             users_with_access=[current_user.username],
-            expired=False
+            expired=False,
         )
 
         # print("TABLE:", LinkRecord.__table__)
@@ -86,20 +88,6 @@ def store_link(link_request: LinkRequest,uuid_str: str, current_user: User):
         session.commit()
 
 
-# def expire_old_links(expiry_days: int = 2):
-#     """
-#     Checks if the current timestamp is past a link's expiration date.
-#     Expires links that are older than the specified number of days (default is 2 days).
-#     """
-#     cutoff = datetime.now() - timedelta(days=expiry_days)
-
-#     with Session() as session:
-#         stmt = select(LinkRecord).where(
-#             (LinkRecord.expired == False) |
-#             (LinkRecord.expired.is_(None))
-#         )
-
-#         records = session.scalars(stmt).all()
 
 #         for record in records:
 #             if not record.timestamp:
@@ -195,6 +183,40 @@ def get_link_by_uuid(uuid_str: str, current_user: User):
             )
         return _serialize_link_record(record)
 
+        if record.creator != current_user.username:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to extend this link"
+            )
+        
+        if extension <= 0 or not isinstance(extension, int):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Extension must be a positive integer"
+            )
+
+        record.expiration_date += timedelta(days=extension)
+        record.expired = False
+        session.commit()
+
+def get_link(uuid_str: str):
+    with Session() as session:
+        stmt = select(LinkRecord).where(LinkRecord.uuid == uuid_str)
+        record = session.scalar(stmt)
+        if not record:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Link not found")
+
+        return {
+            "uuid": record.uuid,
+            "link": record.link,
+            "case_id": record.case_id,
+            "itar": record.itar,
+            "creator": record.creator,
+            "timestamp": record.timestamp,
+            "expiration_date": record.expiration_date,
+            "users_with_access": record.users_with_access,
+            "expired": record.expired,
+        }
 
 def get_all_links(current_user: User):
     """
@@ -206,7 +228,7 @@ def get_all_links(current_user: User):
             detail="User not authenticated"
         )
     with Session() as session:
-        stmt = select(LinkRecord)
+        stmt = select(LinkRecord).where(LinkRecord.creator == current_user.username)
         records = session.scalars(stmt).all()
         return [_serialize_link_record(r) for r in records]
     

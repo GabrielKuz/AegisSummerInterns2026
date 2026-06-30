@@ -1,7 +1,7 @@
 [project]
 name = "backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "Backend for Aegis interns 2026 project"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
@@ -9,7 +9,7 @@ dependencies = [
     "azure-mgmt-resource>=25.0.0",
     "azure-mgmt-storage>=25.0.0",
     "azure-storage-blob>=12.30.0",
-    "fastapi>=0.115.0",
+    "fastapi>=0.138.0",
     "httpx2>=2.4.0",
     "hubspot-api-client>=12.0.0",
     "psycopg[binary]>=3.3.4",

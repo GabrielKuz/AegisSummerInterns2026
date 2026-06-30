@@ -25,6 +25,7 @@ class UploadRecord(Base):
     sas_retrieval_link = Column(Text, nullable=True)
     upload_complete = Column(Boolean, default=False)
     users_with_access = Column(JSON, nullable=True)
+    for_deletion = Column(Boolean, default=False, nullable=False) 
 
 
 class LinkRecord(Base):
@@ -35,6 +36,7 @@ class LinkRecord(Base):
     case_id = Column(String)
     creator = Column(String)
     timestamp = Column(DateTime)
+    expiration_date = Column(DateTime)
     itar = Column(Boolean)
     users_with_access = Column(JSON)
     expired = Column(Boolean)
