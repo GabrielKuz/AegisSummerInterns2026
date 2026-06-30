@@ -17,7 +17,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile
 from modules import Session
-from modules.auth import getCurrentActiveUser, User
+from modules.auth import getCurrentActiveUser, User, getCurrentUserNoAuthForTest
 from modules.models import Base, UploadRecord, LinkRecord
 
 router = APIRouter()
@@ -94,7 +94,6 @@ for container in (us_container, eu_container, itar_container):
 @router.post("/uploadfile/{link_uuid}")
 async def create_upload_file(
     link_uuid: str,
-    current_user: Annotated[User, Depends(getCurrentActiveUser)],
     file: Annotated[UploadFile | None, File(description="A file read as UploadFile")] = None,
     file_hash_clientside: Annotated[str | None, Header(alias="X-File-Hash")] = None,
     userLocation: Annotated[Literal["US", "EU"], Header(alias="X-User-Location")] = "US"
@@ -263,7 +262,7 @@ def get_uploads_for_link(link_uuid: str):
 
 
 @router.get("/links/{linkUUID}/files")
-def listFiles(linkUUID: str, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
+def listFiles(linkUUID: str, current_user: Annotated[User, Depends(getCurrentUserNoAuthForTest)]):
     uploads = get_uploads_for_link(linkUUID)
     authorized_uploads = [
         upload for upload in uploads

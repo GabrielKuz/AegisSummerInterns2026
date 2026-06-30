@@ -20,14 +20,17 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
 
-        <Route path="/upload/:uuid" element={<CustomerUpload />} />
+        
 
         <Route
-          path="/upload"
-          element={
+          path="/upload/:uuid"
+          /*element={
             <RequireDevUser>
               <CustomerLayout />
             </RequireDevUser>
+          }*/
+          element={
+            <CustomerLayout />
           }
         >
           <Route index element={<CustomerUpload />} />

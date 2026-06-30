@@ -6,7 +6,10 @@ import { useParams } from "react-router-dom";
 export function CustomerUpload() {
     const { uuid } = useParams();
     const fileInputRef = useRef<HTMLInputElement>(null);
-
+    
+    if(!uuid){
+        return <p>Invalid upload link</p>
+    }
     const handleBrowseClick = () => {
         fileInputRef.current?.click();
     };
@@ -47,8 +50,8 @@ export function CustomerUpload() {
 
     const uploadFiles = async () => {
         setUploading(true);
-
-        const uuid = "THISISATEMPUID";
+        console.log(uploading);
+        
 
         try {
             for (const item of selectedFiles) {
@@ -71,7 +74,7 @@ export function CustomerUpload() {
                     method: "POST",
                     headers: {
                         Region: "US",
-                        SHA256: sha256
+                        "X-File-Hash": sha256
                     },
                     body: formData
                 });
