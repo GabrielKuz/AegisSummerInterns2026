@@ -1,9 +1,9 @@
 import "./UploadDetails.css";
-import { useState } from "react";
+//import { useState } from "react";
 import "../../styles/SupportTheme.css";
 
 export function UploadDetails() {
-    const [mode, setMode] = useState<"USA" | "EU">("USA");
+    //const [mode, setMode] = useState<"USA" | "EU">("USA");
     return (
 
         <main className="support-main">
