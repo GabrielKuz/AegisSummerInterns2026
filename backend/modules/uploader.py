@@ -94,7 +94,6 @@ for container in (us_container, eu_container, itar_container):
 @router.post("/uploadfile/{link_uuid}")
 async def create_upload_file(
     link_uuid: str,
-    current_user: Annotated[User, Depends(getCurrentActiveUser)],
     file: Annotated[UploadFile | None, File(description="A file read as UploadFile")] = None,
     file_hash_clientside: Annotated[str | None, Header(alias="X-File-Hash")] = None,
     userLocation: Annotated[Literal["US", "EU"], Header(alias="X-User-Location")] = "US"
