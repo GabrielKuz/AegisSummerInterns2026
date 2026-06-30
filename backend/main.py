@@ -9,6 +9,9 @@ from typing import Annotated
 from warnings import deprecated
 from sqlalchemy import text
 from contextlib import asynccontextmanager
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 # @asynccontextmanager
 # async def lifespan():
@@ -45,6 +48,11 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+@app.on_event("startup")
+async def startup():
+    logging.info("Server started on http://localhost:8000")
+    logging.info(f"Frontend accessible at http://{__import__('socket').gethostbyname(__import__('socket').gethostname())}.sslip.io")
 
 def main():
     import uvicorn
