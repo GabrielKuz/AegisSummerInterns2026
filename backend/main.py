@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
-from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, extend_link_expiration
+from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, get_link_by_uuid, get_all_files_for_link
 from modules.auth import getCurrentActiveUser, getCurrentUser, User, userAuthenticated
 from modules.uploader import router as uploader_router, listFiles
 from modules.downloadData import downloadData
@@ -14,13 +14,21 @@ def create_link(link_request: LinkRequest, current_user: Annotated[User, Depends
     #authentication: bool = userAuthenticated(getCurrentUser())
     return generate_links(link_request, current_user) #TODO: CHANGE IMMENDIATLY AFTER TESTING
 
-@app.get("/api/links")
+@app.get("/links")
 def get_links(current_user: Annotated[User, Depends(getCurrentActiveUser)]):
     return get_all_links(current_user)
 
-@app.patch("/links/{uuid}/extend")
-def extend_link_endpoint(uuid: str, extension: int, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
-    return extend_link_expiration(uuid, current_user, extension)
+@app.get("/links/{uuid}")
+def get_link(uuid: str, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
+    return get_link_by_uuid(uuid, current_user)
+
+@app.get("/links/{uuid}/files")
+def get_link_files(uuid: str, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
+    return get_all_files_for_link(uuid, current_user)
+
+# @app.patch("/links/{uuid}/extend")
+# def extend_link_endpoint(uuid: str, extension: int, current_user: Annotated[User, Depends(getCurrentActiveUser)]):
+#     return extend_link_expiration(uuid, current_user, extension)
 
 @app.get("/")
 def read_root():
