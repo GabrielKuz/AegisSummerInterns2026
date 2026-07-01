@@ -131,7 +131,7 @@ export function CreateSupportLinkPage() {
     const data = await response.json();
     console.log(data.uuid);
     console.log(data.link);
-    navigate("/support/links");
+    navigate("/support/links", {state: { refresh: true}});
   };
 
   return (

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, /*useLocation*/ } from "react-router-dom";
 import { useEffect, useState } from "react";
 //import { mockLinks } from "../data/mockLinks";
 import "../../../styles/SupportTheme.css";
@@ -33,7 +33,7 @@ type SupportLink = {
  */
 export function SupportLinksPage() {
   const [links, setLinks] = useState<SupportLink[]>([]);
-
+  //const location = useLocation();
   async function loadLinks() {
     const response = await fetch("/api/links", {headers: { Authorization: `Bearer ${getDevToken()}` }});
     if(!response.ok) {
@@ -41,11 +41,16 @@ export function SupportLinksPage() {
       return;
     }
     const data: SupportLink[] = await response.json();
+    if (!response.ok) {
+      console.error(await response.text());
+      return;
+    }
+    console.log(data);
     setLinks(data);
   }
   useEffect(() => {
     loadLinks();
-  }, []);
+  }, [/*location.key*/]);
   return (
     <section
       className="links-page"
