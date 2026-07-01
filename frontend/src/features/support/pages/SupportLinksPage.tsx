@@ -19,13 +19,14 @@ import { getDevToken } from "../../auth/devAuth";
 }*/
 type SupportLink = {
     uuid: string;
-    caseId: string;
-    itarStatus: boolean;
+    case_id: string;
+    itar: boolean;
     link: string;
     creator: string;
-    usersWithAccess: string[];
-    createdTimestamp: string;
+    users_with_access: string[];
+    timestamp: string;
     expired: boolean;
+    expiration_date: string;
 };
 
 /**
@@ -35,7 +36,7 @@ export function SupportLinksPage() {
   const [links, setLinks] = useState<SupportLink[]>([]);
   //const location = useLocation();
   async function loadLinks() {
-    const response = await fetch("/api/links", {headers: { Authorization: `Bearer ${getDevToken()}` }});
+    const response = await fetch("/api/links/", {headers: { Authorization: `Bearer ${getDevToken()}` }});
     if(!response.ok) {
       console.error("Failed to load support links.");
       return;
@@ -95,6 +96,7 @@ export function SupportLinksPage() {
               <th scope="col">ITAR</th>
               <th scope="col">Creator</th>
               <th scope="col">Created At</th>
+              <th scope="col">Expiration Date</th>
             </tr>
           </thead>
 
@@ -127,10 +129,11 @@ export function SupportLinksPage() {
             {links.map((supportLink) => (
               <tr key={supportLink.uuid}>
                   <td>{supportLink.uuid}</td>
-                  <td>{supportLink.caseId}</td>
-                  <td>{supportLink.itarStatus ? "Yes" : "No"}</td>
+                  <td>{supportLink.case_id}</td>
+                  <td>{supportLink.itar ? "Yes" : "No"}</td>
                   <td>{supportLink.creator}</td>
-                  <td>{new Date(supportLink.createdTimestamp).toLocaleString()}</td>
+                  <td>{new Date(supportLink.timestamp).toLocaleString()}</td>
+                  <td>{new Date(supportLink.expiration_date).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
