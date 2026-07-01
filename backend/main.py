@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
-from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, get_link_by_uuid, get_all_files_for_link
+from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, get_all_files_for_link
 from modules.auth import getCurrentActiveUser, getCurrentUser, User, userAuthenticated
 from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, get_link
 from modules.auth import getCurrentActiveUser, getCurrentUser, User
@@ -13,7 +13,7 @@ from sqlalchemy import text
 from contextlib import asynccontextmanager
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO) # setup logging server. TODO: change to file and add more logging
 
 # @asynccontextmanager
 # async def lifespan():
@@ -53,7 +53,7 @@ async def startup():
     logging.info("Server started on http://localhost:8000")
     logging.info(f"Frontend accessible at http://{__import__('socket').gethostbyname(__import__('socket').gethostname())}.sslip.io")
 
-def main():
+def main(): # start the app when run directly and not through docker
     import uvicorn
 
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
@@ -73,6 +73,6 @@ def download_link(uuid: str, currentUser: Annotated[User, Depends(getCurrentActi
 def download_upload(upload_id: str, currentUser: Annotated[User, Depends(getCurrentActiveUser)]):
     return downloadData(upload_id, currentUser)
 
-if __name__ == "__main__":
+if __name__ == "__main__": # Doesnt get run by docker
     main()
 
