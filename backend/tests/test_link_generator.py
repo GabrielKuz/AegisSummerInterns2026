@@ -10,7 +10,7 @@ from modules.models import UploadRecord, LinkRecord
 from modules.uploader import ensure_uploads_table
 import os
 import uuid
-from modules.LinkGenerator import LinkRequest, generate_links, get_all_links, extend_link_expiration, expire_old_links
+from modules.LinkGenerator import LinkRequest, generate_links, get_all_links
 from datetime import datetime, timedelta
 from modules.auth import User, getCurrentActiveUser
 import os
