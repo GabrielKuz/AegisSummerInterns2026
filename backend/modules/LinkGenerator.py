@@ -56,7 +56,6 @@ def generate_links(link_request: LinkRequest, current_user: User):
     }
 
 
-def store_link(link_request: LinkRequest, uuid_str: str, current_user: User):
 def store_link(link_request: LinkRequest,uuid_str: str, current_user: User):
     """
     Stores the generated link and UUID in the database with associated case ID, 
