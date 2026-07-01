@@ -19,7 +19,7 @@ class DummyTicket:
 
 
 def test_advancedSearchThroughHubSpot_builds_search_request_and_returns_first_result(monkeypatch):
-    ticket = DummyTicket(properties={"ais_ticket_number": "AIS123", "company_name": "Acme"}, id="123")
+    ticket = DummyTicket(properties={"ais_ticket_number": "AIS-0000", "company_name": "Acme"}, id="123")
     response = SimpleNamespace(results=[ticket])
 
     captured = {}
@@ -34,11 +34,11 @@ def test_advancedSearchThroughHubSpot_builds_search_request_and_returns_first_re
         fake_do_search,
     )
 
-    result = hs.advancedSearchThroughHubSpot("AIS123", "ais_ticket_number")
+    result = hs.advancedSearchThroughHubSpot("AIS-0000", "ais_ticket_number")
 
     assert result is ticket
     assert captured["request"].filter_groups[0].filters[0].property_name == "ais_ticket_number"
-    assert captured["request"].filter_groups[0].filters[0].value == "AIS123"
+    assert captured["request"].filter_groups[0].filters[0].value == "AIS-0000"
     assert "ais_ticket_number" in captured["request"].properties
 
 
@@ -51,28 +51,28 @@ def test_advancedSearchThroughHubSpot_returns_none_on_api_exception(monkeypatch)
         raise hs.ApiException("search failure")
 
     monkeypatch.setattr(hs.api_client.crm.tickets.search_api, "do_search", fake_do_search)
-    assert hs.advancedSearchThroughHubSpot("AIS123", "ais_ticket_number") is None
+    assert hs.advancedSearchThroughHubSpot("AIS-0000", "ais_ticket_number") is None
 
 
 def test_advancedSearchThroughHubSpot_returns_none_when_no_results(monkeypatch):
     response = SimpleNamespace(results=[])
     monkeypatch.setattr(hs.api_client.crm.tickets.search_api, "do_search", lambda _req: response)
-    assert hs.advancedSearchThroughHubSpot("AIS123", "ais_ticket_number") is None
+    assert hs.advancedSearchThroughHubSpot("AIS-0000", "ais_ticket_number") is None
 
 
 def test_get_ticket_delegates_to_advanced_search(monkeypatch):
-    ticket = DummyTicket(properties={"ais_ticket_number": "AIS123"})
-    monkeypatch.setattr(hs, "advancedSearchThroughHubSpot", lambda value, field: ticket if value == "AIS123" else None)
+    ticket = DummyTicket(properties={"ais_ticket_number": "AIS-0000"})
+    monkeypatch.setattr(hs, "advancedSearchThroughHubSpot", lambda value, field: ticket if value == "AIS-0000" else None)
 
-    assert hs.get_ticket("AIS123") is ticket
+    assert hs.get_ticket("AIS-0000") is ticket
     assert hs.get_ticket("MISSING") is None
 
 
 def test_get_AIS_Id_returns_ais_ticket_number(monkeypatch):
-    ticket = DummyTicket(properties={"ais_ticket_number": "AIS123"})
+    ticket = DummyTicket(properties={"ais_ticket_number": "AIS-0000"})
     monkeypatch.setattr(hs, "advancedSearchThroughHubSpot", lambda value, field: ticket)
 
-    assert hs.get_AIS_Id("123") == "AIS123"
+    assert hs.get_AIS_Id("123") == "AIS-0000"
 
 
 def test_get_AIS_Id_returns_none_when_ticket_not_found(monkeypatch):
@@ -81,30 +81,78 @@ def test_get_AIS_Id_returns_none_when_ticket_not_found(monkeypatch):
 
 
 def test_quikSrch_returns_ticket_property(monkeypatch):
-    ticket = DummyTicket(properties={"company_name": "Acme", "createdate": "2026-06-30"})
+    ticket = DummyTicket(properties={"company_name": "Doofenshmirtz Evil Incorporated", "createdate": "2026-06-30"})
     monkeypatch.setattr(hs, "get_ticket", lambda value: ticket)
 
-    assert hs.quikSrch("AIS123", "company_name") == "Acme"
-    assert hs.quikSrch("AIS123", "createdate") == "2026-06-30"
+    assert hs.quikSrch("AIS-0000", "company_name") == "Doofenshmirtz Evil Incorporated"
+    assert hs.quikSrch("AIS-0000", "createdate") == "2026-06-30"
 
 
 def test_quikSrch_returns_none_when_ticket_missing(monkeypatch):
     monkeypatch.setattr(hs, "get_ticket", lambda value: None)
-    assert hs.quikSrch("AIS123", "company_name") is None
+    assert hs.quikSrch("AIS-0000", "company_name") is None
 
 
 def test_quikAtrbt_returns_ticket_attribute(monkeypatch):
-    ticket = DummyTicket(properties={"ais_ticket_number": "AIS123"}, id="12345", archived=True)
+    ticket = DummyTicket(properties={"ais_ticket_number": "AIS-0000"}, id="12345", archived=True)
     monkeypatch.setattr(hs, "get_ticket", lambda value: ticket)
 
-    assert hs.quikAtrbt("AIS123", "id") == "12345"
-    assert hs.quikAtrbt("AIS123", "archived") is True
+    assert hs.quikAtrbt("AIS-0000", "id") == "12345"
+    assert hs.quikAtrbt("AIS-0000", "archived") is True
 
 
 def test_quikAtrbt_returns_none_for_missing_attribute(monkeypatch):
-    ticket = DummyTicket(properties={"ais_ticket_number": "AIS123"})
+    ticket = DummyTicket(properties={"ais_ticket_number": "AIS-0000"})
     monkeypatch.setattr(hs, "get_ticket", lambda value: ticket)
-    assert hs.quikAtrbt("AIS123", "archived_at") is None
+    assert hs.quikAtrbt("AIS-0000", "archived_at") is None
+
+
+def test_get_caseStatus_returns_pipeline_stage(monkeypatch):
+    monkeypatch.setattr(hs, "get_pipeline_stage", lambda value: "stage-1")
+    monkeypatch.setattr(hs, "get_pipeline", lambda value: "pipeline-1")
+
+    class DummyStage:
+        def __init__(self, stage_id, label):
+            self.id = stage_id
+            self.label = label
+
+    class DummyPipeline:
+        def __init__(self, pipeline_id, stage_id, label):
+            self.id = pipeline_id
+            self.stages = [DummyStage(stage_id, label)]
+
+    class DummyResponse:
+        def __init__(self, pipelines):
+            self.results = pipelines
+
+    monkeypatch.setattr(
+        hs.api_client.crm.pipelines.pipelines_api.__class__,
+        "get_all",
+        lambda self, object_type="tickets": DummyResponse([DummyPipeline("pipeline-1", "stage-1", "Closed Won")]),
+    )
+
+    assert hs.get_caseStatus("AIS-0000") == "Closed Won"
+
+
+def test_get_caseStatus_returns_none_when_ticket_missing(monkeypatch):
+    monkeypatch.setattr(hs, "get_pipeline_stage", lambda value: None)
+    monkeypatch.setattr(hs, "get_pipeline", lambda value: None)
+
+    assert hs.get_caseStatus("AIS-0000") is None
+
+
+def test_get_caseITARstatus_returns_itar_value(monkeypatch):
+    ticket = DummyTicket(properties={"itar": "true"})
+    monkeypatch.setattr(hs, "get_ticket", lambda value: ticket)
+
+    assert hs.get_caseITARstatus("AIS-0000") == "true"
+
+
+def test_get_caseITARstatus_returns_none_when_property_missing(monkeypatch):
+    ticket = DummyTicket(properties={"company_name": "Acme"})
+    monkeypatch.setattr(hs, "get_ticket", lambda value: ticket)
+
+    assert hs.get_caseITARstatus("AIS-0000") is None
 
 
 @pytest.mark.parametrize(
@@ -113,14 +161,13 @@ def test_quikAtrbt_returns_none_for_missing_attribute(monkeypatch):
         ("get_ticket_id", "12345", "id", "12345"),
         ("is_ticket_archived", True, "archived", True),
         ("ticket_archive_location", None, "archived_at", None),
-        ("ticket_updated_at", None, "updated at", None),
     ],
 )
 def test_attribute_accessors(function_name, expected_value, attribute_name, attribute_value, monkeypatch):
     ticket = DummyTicket(properties={})
     setattr(ticket, attribute_name, attribute_value)
     monkeypatch.setattr(hs, "get_ticket", lambda value: ticket)
-    assert getattr(hs, function_name)("AIS123") == expected_value
+    assert getattr(hs, function_name)("AIS-0000") == expected_value
 
 
 @pytest.mark.parametrize(
@@ -135,4 +182,4 @@ def test_attribute_accessors(function_name, expected_value, attribute_name, attr
 def test_property_accessors(function_name, property_name, expected_value, monkeypatch):
     ticket = DummyTicket(properties={property_name: expected_value})
     monkeypatch.setattr(hs, "get_ticket", lambda value: ticket)
-    assert getattr(hs, function_name)("AIS123") == expected_value
+    assert getattr(hs, function_name)("AIS-0000") == expected_value

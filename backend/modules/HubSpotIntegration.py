@@ -7,6 +7,8 @@ from hubspot.crm.tickets.models import Filter, FilterGroup
 
 api_client = HubSpot(access_token=os.getenv("HUBSPOT_ACCESS_TOKEN"))
 
+
+
 #=======================================================================================================
 # Main Functions
 #=======================================================================================================
@@ -41,14 +43,11 @@ def quikAtrbt(ais_id: str, searchTerm: str) -> Optional[str]:
 def get_ticket_id(ais_id: str) -> Optional[str]:
     return quikAtrbt(ais_id, 'id')
 
-def is_ticket_archived(ais_id: str) -> Optional[str]:
+def is_ticket_archived(ais_id: str) -> Optional[bool]:
     return quikAtrbt(ais_id, 'archived')
 
 def ticket_archive_location(ais_id: str) -> Optional[str]:
     return quikAtrbt(ais_id, 'archived_at')
-
-def ticket_updated_at(ais_id: str) -> Optional[str]:
-    return quikAtrbt(ais_id, 'updated at')
 
 #=======================================================================================================
 # Property functions 
@@ -60,23 +59,48 @@ def get_caseCreateDate(ais_id: str) -> Optional[str]:
 def get_caseCloseDate(ais_id: str) -> Optional[str]:
     return quikSrch(ais_id,"closedate")
 
-#def get_caseStatus(ais_id: str) -> Optional[str]:
-#    return quikSrch(ais_id,"case_status")
-
-#def get_caseSource(ais_id: str) -> Optional[str]:
-#    return quikSrch(ais_id,"case_source")
-
-#def get_caseITARstatus(ais_id: str) -> Optional[str]:
-#    return quikSrch(ais_id,"itar")
-
-#def get_caseIssue(ais_id: str) -> Optional[str]:
-#    return quikSrch(ais_id,"category")
+def get_caseITARstatus(ais_id: str) -> Optional[bool]:
+    return quikSrch(ais_id,"itar")
 
 def get_caseCompany(ais_id: str) -> Optional[str]:
     return quikSrch(ais_id,"company_name")
 
 def get_caseSQLServer(ais_id: str) -> Optional[str]:
     return quikSrch(ais_id,"sql_server")
+
+#=======================================================================================================
+# Pipeline functions 
+#=======================================================================================================
+
+def get_pipeline_stage(ais_id: str) -> Optional[str]:
+    return quikSrch(ais_id,"hs_pipeline_stage")
+
+def get_pipeline(ais_id: str) -> Optional[str]:
+    return quikSrch(ais_id,"hs_pipeline")
+
+def get_caseStatus(ais_id: str) -> Optional[str]:
+    stage_id = get_pipeline_stage(ais_id)
+    pipeline_id = get_pipeline(ais_id)
+
+    if not stage_id or not pipeline_id:
+        return None
+
+    # build lookup here
+    stage_lookup = {}
+
+    try:
+        response = api_client.crm.pipelines.pipelines_api.get_all(
+            object_type="tickets"
+        )
+    except ApiException:
+        return None
+
+    for pipeline in response.results:
+        for stage in pipeline.stages:
+            stage_lookup[(pipeline.id, stage.id)] = stage.label
+
+    return stage_lookup.get((pipeline_id, stage_id))
+
 
 #=======================================================================================================
 # Miscellaneous functions 
@@ -97,7 +121,7 @@ def advancedSearchThroughHubSpot(searchTerm: str, searchTermHS_name: str):
                 ]
             )
         ],
-        properties=["ais_ticket_number", "hs_object_id", "createdate", "sql_server", "company_name", "hs_lastmodifieddate","closedate","case_status(fill with correct data later)","source_type(fill with correct data later)","itar(fill with correct data later)","issue(fill with correct data later)"],
+        properties=["ais_ticket_number", "hs_object_id", "createdate", "sql_server", "company_name", "hs_lastmodifieddate","closedate","hs_pipeline_stage","hs_pipeline","itar",],
     )
 
     try:
